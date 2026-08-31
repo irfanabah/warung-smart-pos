@@ -1,0 +1,6 @@
+{
+  "name": "Warung Smart POS",
+  "description": "Aplikasi kasir pintar serbaguna dengan POS kasir, manajemen stok, custom menu seblak, mini ATM & PPOB, buku kasbon hutang, dan laporan laba.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
