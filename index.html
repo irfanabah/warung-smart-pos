@@ -7,243 +7,400 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .active-tab { color: #0d9488; }
+        .active-tab-bg { background-color: #ccfbf1; }
+    </style>
 </head>
-<body class="bg-gray-900 text-gray-100 font-sans min-h-screen pb-20">
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen pb-24">
 
     <!-- Header / Navbar -->
-    <header class="bg-gray-800 border-b border-gray-700 p-4 sticky top-0 z-40 flex justify-between items-center shadow-lg">
-        <h1 class="text-xl font-bold text-amber-500 flex items-center gap-2">
-            <i class="fa-solid fa-store"></i> Kasir Warung
-        </h1>
-        <div id="cartCountBadge" class="bg-amber-500 text-gray-900 font-bold px-3 py-1 rounded-full text-sm">
-            Keranjang: 0
+    <header class="bg-white border-b border-gray-200 p-4 sticky top-0 z-40 flex justify-between items-center shadow-sm">
+        <div>
+            <h1 class="text-lg font-bold text-teal-600 flex items-center gap-2">
+                <i class="fa-solid fa-store"></i> Warung Bismillah
+            </h1>
+            <p class="text-xs text-gray-500">POS Kasir Warung Smart</p>
+        </div>
+        <div class="flex items-center gap-2">
+            <span id="cartBadge" class="bg-teal-100 text-teal-800 text-xs font-bold px-2.5 py-1 rounded-full">
+                🛒 <span id="cartCount">0</span>
+            </span>
         </div>
     </header>
 
-    <!-- Navigation Tabs -->
-    <nav class="flex bg-gray-800 border-b border-gray-700 sticky top-14 z-30 overflow-x-auto text-xs sm:text-sm">
-        <button onclick="switchTab('kasir')" id="tab-kasir" class="flex-1 py-3 px-2 text-center font-semibold border-b-2 border-amber-500 text-amber-500">
-            <i class="fa-solid fa-cash-register block text-base mb-1"></i> Transaksi
-        </button>
-        <button onclick="switchTab('seblak')" id="tab-seblak" class="flex-1 py-3 px-2 text-center font-semibold border-b-2 border-transparent text-gray-400">
-            <i class="fa-solid fa-bowl-food block text-base mb-1"></i> Racik Seblak
-        </button>
-        <button onclick="switchTab('kasbon')" id="tab-kasbon" class="flex-1 py-3 px-2 text-center font-semibold border-b-2 border-transparent text-gray-400">
-            <i class="fa-solid fa-book-bookmark block text-base mb-1"></i> Kasbon
-        </button>
-        <button onclick="switchTab('atm')" id="tab-atm" class="flex-1 py-3 px-2 text-center font-semibold border-b-2 border-transparent text-gray-400">
-            <i class="fa-solid fa-building-columns block text-base mb-1"></i> Mini ATM
-        </button>
-        <button onclick="switchTab('produk')" id="tab-produk" class="flex-1 py-3 px-2 text-center font-semibold border-b-2 border-transparent text-gray-400">
-            <i class="fa-solid fa-boxes-stacked block text-base mb-1"></i> Kelola Stok
-        </button>
-    </nav>
+    <main class="p-4 max-w-xl mx-auto">
 
-    <main class="p-4 max-w-4xl mx-auto">
-
-        <!-- 1. TAB KASIR / TRANSAKSI -->
-        <section id="view-kasir" class="space-y-4">
-            <div class="bg-gray-800 p-4 rounded-xl border border-gray-700">
-                <button onclick="toggleScanner()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg font-bold flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-barcode"></i> Scan Barcode Belanjaan
-                </button>
-                <div id="reader" class="mt-3 hidden rounded-lg overflow-hidden border border-indigo-500"></div>
+        <!-- 1. BERANDA (DASHBOARD) -->
+        <section id="view-beranda" class="space-y-4">
+            <!-- Greeting Card -->
+            <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex justify-between items-center">
+                <div>
+                    <h2 class="text-base font-bold text-gray-800">Selamat Datang! 👋</h2>
+                    <p class="text-xs text-gray-500">Ringkasan operasional warung hari ini</p>
+                </div>
+                <span class="bg-emerald-50 text-emerald-600 text-xs font-semibold px-2.5 py-1 rounded-full border border-emerald-200">ONLINE</span>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Catalog -->
-                <div class="bg-gray-800 p-4 rounded-xl border border-gray-700">
-                    <h2 class="font-bold text-base mb-3 text-amber-400">Daftar Barcode & Produk</h2>
-                    <div id="productList" class="space-y-2 max-h-80 overflow-y-auto pr-1">
-                        <!-- Rendered by JS -->
-                    </div>
+            <!-- Omzet & Penjualan Cards -->
+            <div class="grid grid-cols-2 gap-3">
+                <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+                    <p class="text-xs text-gray-400 font-medium">Total Pesanan</p>
+                    <h3 id="dashTotalOrders" class="text-xl font-extrabold text-gray-800 mt-1">0</h3>
                 </div>
+                <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+                    <p class="text-xs text-gray-400 font-medium">Penjualan Hari Ini</p>
+                    <h3 id="dashTotalOmzet" class="text-xl font-extrabold text-teal-600 mt-1">Rp 0</h3>
+                </div>
+            </div>
 
-                <!-- Cart Summary -->
-                <div class="bg-gray-800 p-4 rounded-xl border border-gray-700 flex flex-col justify-between">
-                    <div>
-                        <h2 class="font-bold text-base mb-3 text-amber-400">Detail Keranjang</h2>
-                        <div id="cartList" class="space-y-2 text-sm max-h-48 overflow-y-auto mb-4">
-                            <p class="text-gray-500 text-center py-4">Keranjang masih kosong</p>
-                        </div>
-                    </div>
-                    <div class="border-t border-gray-700 pt-3">
-                        <div class="flex justify-between font-bold text-lg mb-3">
-                            <span>Total:</span>
-                            <span id="cartTotal" class="text-amber-400">Rp 0</span>
-                        </div>
-                        <button onclick="checkout()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg text-center">
-                            Selesaikan Bayar
-                        </button>
-                    </div>
+            <!-- Quick Features / Operasional -->
+            <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Operasional & Fitur Khusus</h3>
+                <div class="grid grid-cols-4 gap-2 text-center">
+                    <button onclick="switchTab('seblak')" class="p-2 hover:bg-gray-50 rounded-xl">
+                        <div class="w-10 h-10 mx-auto bg-orange-100 text-orange-500 rounded-full flex items-center justify-center text-lg mb-1">🔥</div>
+                        <span class="text-[11px] font-semibold text-gray-600 block">Seblak</span>
+                    </button>
+                    <button onclick="switchTab('kasbon')" class="p-2 hover:bg-gray-50 rounded-xl">
+                        <div class="w-10 h-10 mx-auto bg-amber-100 text-amber-600 rounded-full flex items-center justify-center text-lg mb-1">📖</div>
+                        <span class="text-[11px] font-semibold text-gray-600 block">Kasbon</span>
+                    </button>
+                    <button onclick="switchTab('atm')" class="p-2 hover:bg-gray-50 rounded-xl">
+                        <div class="w-10 h-10 mx-auto bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-lg mb-1">🏦</div>
+                        <span class="text-[11px] font-semibold text-gray-600 block">Mini ATM</span>
+                    </button>
+                    <button onclick="switchTab('produk')" class="p-2 hover:bg-gray-50 rounded-xl">
+                        <div class="w-10 h-10 mx-auto bg-teal-100 text-teal-600 rounded-full flex items-center justify-center text-lg mb-1">📦</div>
+                        <span class="text-[11px] font-semibold text-gray-600 block">Stok</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Low Stock Warning -->
+            <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+                <h3 class="text-xs font-bold text-amber-600 uppercase tracking-wider mb-2 flex items-center gap-1">
+                    ⚠️ Stok Menipis
+                </h3>
+                <div id="lowStockList" class="space-y-2 text-xs">
+                    <!-- Rendered by JS -->
                 </div>
             </div>
         </section>
 
-        <!-- 2. TAB RACIK SEBLAK -->
-        <section id="view-seblak" class="hidden space-y-4">
-            <div class="bg-gray-800 p-4 rounded-xl border border-gray-700">
-                <h2 class="text-lg font-bold text-amber-400 mb-2">🔥 Custom Order Seblak</h2>
-                <p class="text-xs text-gray-400 mb-4">Pilih topping dan tingkat pedas sesuai permintaan pembeli.</p>
+        <!-- 2. PRODUK -->
+        <section id="view-produk" class="hidden space-y-4">
+            <div class="flex justify-between items-center">
+                <h2 class="text-lg font-bold text-gray-800">Daftar Produk</h2>
+                <button onclick="openAddProductModal()" class="bg-teal-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm">
+                    + Tambah Produk
+                </button>
+            </div>
 
-                <div class="space-y-4">
+            <!-- Search Bar -->
+            <input type="text" id="searchProductInput" onkeyup="renderProducts()" placeholder="🔍 Cari nama atau barcode..." class="w-full bg-white border border-gray-200 rounded-xl p-2.5 text-xs shadow-sm">
+
+            <!-- Product List -->
+            <div id="produkMasterList" class="space-y-2">
+                <!-- Rendered by JS -->
+            </div>
+        </section>
+
+        <!-- 3. KASIR (TRANSAKSI) -->
+        <section id="view-kasir" class="hidden space-y-4">
+            <!-- Scan & Cart Buttons -->
+            <div class="grid grid-cols-2 gap-2">
+                <button onclick="toggleScanner()" class="bg-indigo-600 text-white p-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-sm">
+                    <i class="fa-solid fa-barcode"></i> Scan Barcode
+                </button>
+                <button onclick="switchTab('seblak')" class="bg-orange-500 text-white p-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-sm">
+                    🔥 Racik Seblak
+                </button>
+            </div>
+
+            <div id="reader" class="hidden rounded-xl overflow-hidden border border-indigo-200"></div>
+
+            <!-- Product Grid -->
+            <div class="bg-white p-3 rounded-2xl border border-gray-100 shadow-sm">
+                <h3 class="text-xs font-bold text-gray-400 mb-3">PILIH PRODUK</h3>
+                <div id="kasirGrid" class="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto">
+                    <!-- Rendered by JS -->
+                </div>
+            </div>
+
+            <!-- Cart Section -->
+            <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm space-y-3">
+                <h3 class="text-xs font-bold text-teal-600 uppercase tracking-wider">Keranjang Transaksi</h3>
+                <div id="cartItemsList" class="space-y-2 text-xs max-h-40 overflow-y-auto">
+                    <p class="text-gray-400 text-center py-3">Keranjang kosong</p>
+                </div>
+                <div class="border-t pt-3 flex justify-between items-center">
                     <div>
-                        <label class="block text-sm font-semibold mb-1">Pilih Level Pedas:</label>
-                        <select id="seblakPedas" class="w-full bg-gray-700 border border-gray-600 rounded p-2 text-sm">
-                            <option value="Level 0 (Tidak Pedas)">Level 0 (Tidak Pedas)</option>
-                            <option value="Level 1 (Sedang)">Level 1 (Sedang)</option>
-                            <option value="Level 2 (Pedas)">Level 2 (Pedas)</option>
-                            <option value="Level 3 (Super Pedas)">Level 3 (Super Pedas) +Rp 1.000</option>
-                        </select>
+                        <span class="text-xs text-gray-400 block">Total Bayar:</span>
+                        <span id="cartTotalPrice" class="text-lg font-extrabold text-teal-600">Rp 0</span>
                     </div>
-
-                    <div>
-                        <label class="block text-sm font-semibold mb-2">Topping Tambahan:</label>
-                        <div class="grid grid-cols-2 gap-2 text-sm">
-                            <label class="flex items-center gap-2 bg-gray-700 p-2 rounded">
-                                <input type="checkbox" value="Kerupuk:1000" class="topping-check"> Kerupuk (+1k)
-                            </label>
-                            <label class="flex items-center gap-2 bg-gray-700 p-2 rounded">
-                                <input type="checkbox" value="Bakso:2000" class="topping-check"> Bakso (+2k)
-                            </label>
-                            <label class="flex items-center gap-2 bg-gray-700 p-2 rounded">
-                                <input type="checkbox" value="Sosis:2000" class="topping-check"> Sosis (+2k)
-                            </label>
-                            <label class="flex items-center gap-2 bg-gray-700 p-2 rounded">
-                                <input type="checkbox" value="Telur:3000" class="topping-check"> Telur (+3k)
-                            </label>
-                            <label class="flex items-center gap-2 bg-gray-700 p-2 rounded">
-                                <input type="checkbox" value="Dumpling:3000" class="topping-check"> Dumpling (+3k)
-                            </label>
-                            <label class="flex items-center gap-2 bg-gray-700 p-2 rounded">
-                                <input type="checkbox" value="Ceker:3000" class="topping-check"> Ceker (+3k)
-                            </label>
-                        </div>
-                    </div>
-
-                    <button onclick="addSeblakToCart()" class="w-full bg-amber-500 hover:bg-amber-600 text-gray-900 font-bold py-3 rounded-lg mt-4">
-                        + Tambahkan Seblak ke Keranjang
+                    <button onclick="checkout()" class="bg-teal-600 text-white px-5 py-2.5 rounded-xl font-bold text-xs shadow-md hover:bg-teal-700">
+                        Bayar Sekarang
                     </button>
                 </div>
             </div>
         </section>
 
-        <!-- 3. TAB KASBON -->
-        <section id="view-kasbon" class="hidden space-y-4">
-            <div class="bg-gray-800 p-4 rounded-xl border border-gray-700">
-                <h2 class="text-lg font-bold text-amber-400 mb-3">Catat Utang / Kasbon</h2>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-4">
-                    <input type="text" id="kasbonNama" placeholder="Nama Pelanggan" class="bg-gray-700 border border-gray-600 rounded p-2 text-sm">
-                    <input type="number" id="kasbonJumlah" placeholder="Jumlah Nominal (Rp)" class="bg-gray-700 border border-gray-600 rounded p-2 text-sm">
-                    <button onclick="tambahKasbon()" class="bg-red-600 hover:bg-red-700 text-white font-bold p-2 rounded text-sm">Simpan Utang</button>
-                </div>
+        <!-- 4. LAPORAN -->
+        <section id="view-laporan" class="hidden space-y-4">
+            <h2 class="text-lg font-bold text-gray-800">Laporan Keuangan</h2>
 
-                <div class="border-t border-gray-700 pt-3">
-                    <h3 class="font-bold text-sm mb-2">Daftar Tunggakan</h3>
-                    <div id="kasbonList" class="space-y-2 text-sm">
-                        <!-- Rendered by JS -->
-                    </div>
+            <!-- Laba Rugi Card -->
+            <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm space-y-3 text-xs">
+                <h3 class="font-bold text-gray-700 text-sm border-b pb-2">📊 Estimasi Laba Rugi Harian</h3>
+                <div class="flex justify-between">
+                    <span class="text-gray-500">Pendapatan Kotor (Omzet):</span>
+                    <span id="lapOmzet" class="font-bold text-gray-800">Rp 0</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-500">HPP (Modal Barang):</span>
+                    <span id="lapHpp" class="font-bold text-red-500">Rp 0</span>
+                </div>
+                <div class="flex justify-between border-t pt-2 text-sm">
+                    <span class="font-bold text-gray-700">Laba Bersih:</span>
+                    <span id="lapLaba" class="font-extrabold text-teal-600">Rp 0</span>
                 </div>
             </div>
         </section>
 
-        <!-- 4. TAB MINI ATM & PPOB -->
-        <section id="view-atm" class="hidden space-y-4">
-            <div class="bg-gray-800 p-4 rounded-xl border border-gray-700">
-                <h2 class="text-lg font-bold text-amber-400 mb-3">Layanan Mini ATM & Transfer</h2>
-                <div class="space-y-3">
-                    <select id="atmJenis" class="w-full bg-gray-700 border border-gray-600 rounded p-2 text-sm">
-                        <option value="Transfer Bank">Transfer Bank</option>
-                        <option value="Tarik Tunai">Tarik Tunai</option>
-                        <option value="Token PLN / Pulsa">Token PLN / Pulsa</option>
+        <!-- 5. LAINNYA (FITUR WARUNG: SEBLAK, KASBON, ATM) -->
+        <section id="view-lainnya" class="hidden space-y-4">
+            <h2 class="text-lg font-bold text-gray-800">Menu & Pengaturan Lainnya</h2>
+
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm divide-y divide-gray-100 text-xs">
+                <button onclick="switchTab('seblak')" class="w-full p-4 flex items-center justify-between text-left hover:bg-gray-50">
+                    <div class="flex items-center gap-3">
+                        <span class="text-lg">🔥</span>
+                        <div>
+                            <div class="font-bold text-gray-800">Racik Seblak Custom</div>
+                            <div class="text-gray-400">Atur level pedas & pilihan topping</div>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-gray-300"></i>
+                </button>
+
+                <button onclick="switchTab('kasbon')" class="w-full p-4 flex items-center justify-between text-left hover:bg-gray-50">
+                    <div class="flex items-center gap-3">
+                        <span class="text-lg">📖</span>
+                        <div>
+                            <div class="font-bold text-gray-800">Daftar Utang / Kasbon</div>
+                            <div class="text-gray-400">Pencatatan utang warga & pelunasan</div>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-gray-300"></i>
+                </button>
+
+                <button onclick="switchTab('atm')" class="w-full p-4 flex items-center justify-between text-left hover:bg-gray-50">
+                    <div class="flex items-center gap-3">
+                        <span class="text-lg">🏦</span>
+                        <div>
+                            <div class="font-bold text-gray-800">Layanan Mini ATM / PPOB</div>
+                            <div class="text-gray-400">Catat transfer, tarik tunai & admin warung</div>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-gray-300"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- SUB-PAGE: RACIK SEBLAK -->
+        <section id="view-seblak" class="hidden space-y-4">
+            <button onclick="switchTab('kasir')" class="text-xs text-teal-600 font-bold mb-2">← Kembali ke Kasir</button>
+            <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm space-y-4 text-xs">
+                <h3 class="text-sm font-bold text-orange-600">🔥 Racik Seblak Custom</h3>
+                <div>
+                    <label class="font-bold block mb-1">Level Pedas:</label>
+                    <select id="seblakLevel" class="w-full border rounded-xl p-2.5 bg-gray-50">
+                        <option value="Level 0 (Tidak Pedas):0">Level 0 (Tidak Pedas)</option>
+                        <option value="Level 1 (Sedang):0">Level 1 (Sedang)</option>
+                        <option value="Level 2 (Pedas):0">Level 2 (Pedas)</option>
+                        <option value="Level 3 (Super Pedas):1000">Level 3 (Super Pedas) +1k</option>
                     </select>
-                    <input type="number" id="atmNominal" placeholder="Nominal Transaksi (Rp)" class="w-full bg-gray-700 border border-gray-600 rounded p-2 text-sm">
-                    <input type="number" id="atmAdmin" placeholder="Biaya Admin / Admin Warung (Rp)" class="w-full bg-gray-700 border border-gray-600 rounded p-2 text-sm" value="3000">
-                    <button onclick="catatAtm()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded text-sm">Proses & Catat Transaksi</button>
                 </div>
-            </div>
-
-            <div class="bg-gray-800 p-4 rounded-xl border border-gray-700">
-                <h3 class="font-bold text-sm mb-2">Riwayat Mini ATM</h3>
-                <div id="atmHistory" class="space-y-2 text-sm text-gray-400">
-                    <p class="text-center py-2">Belum ada transaksi ATM</p>
+                <div>
+                    <label class="font-bold block mb-1">Topping Additional:</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <label class="flex items-center gap-2 border p-2 rounded-xl"><input type="checkbox" value="Kerupuk:1000" class="top-check"> Kerupuk (+1k)</label>
+                        <label class="flex items-center gap-2 border p-2 rounded-xl"><input type="checkbox" value="Bakso:2000" class="top-check"> Bakso (+2k)</label>
+                        <label class="flex items-center gap-2 border p-2 rounded-xl"><input type="checkbox" value="Sosis:2000" class="top-check"> Sosis (+2k)</label>
+                        <label class="flex items-center gap-2 border p-2 rounded-xl"><input type="checkbox" value="Telur:3000" class="top-check"> Telur (+3k)</label>
+                    </div>
                 </div>
+                <button onclick="addSeblakToCart()" class="w-full bg-orange-500 text-white py-3 rounded-xl font-bold shadow-md">
+                    + Masukkan ke Keranjang
+                </button>
             </div>
         </section>
 
-        <!-- 5. TAB KELOLA STOK PRODUK -->
-        <section id="view-produk" class="hidden space-y-4">
-            <div class="bg-gray-800 p-4 rounded-xl border border-gray-700">
-                <h2 class="text-lg font-bold text-amber-400 mb-3">Input / Tambah Produk Baru</h2>
-                <div class="space-y-3">
-                    <div class="flex gap-2">
-                        <input type="text" id="newBarcode" placeholder="Kode Barcode (Scan / Ketik)" class="flex-1 bg-gray-700 border border-gray-600 rounded p-2 text-sm">
-                        <button onclick="scanForNewProduct()" class="bg-indigo-600 px-3 py-2 rounded text-xs font-bold">Scan</button>
-                    </div>
-                    <input type="text" id="newName" placeholder="Nama Produk" class="w-full bg-gray-700 border border-gray-600 rounded p-2 text-sm">
-                    <input type="number" id="newPrice" placeholder="Harga Jual (Rp)" class="w-full bg-gray-700 border border-gray-600 rounded p-2 text-sm">
-                    <div>
-                        <label class="text-xs text-gray-400 block mb-1">Jumlah Stok (Bisa diisi/dikosongkan):</label>
-                        <input type="number" id="newStock" placeholder="Contoh: 10 (atau kosongkan)" class="w-full bg-gray-700 border border-gray-600 rounded p-2 text-sm">
-                    </div>
-                    <button onclick="simpanProduk()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded text-sm">Simpan Produk</button>
-                </div>
+        <!-- SUB-PAGE: KASBON -->
+        <section id="view-kasbon" class="hidden space-y-4">
+            <button onclick="switchTab('lainnya')" class="text-xs text-teal-600 font-bold mb-2">← Kembali ke Pengaturan</button>
+            <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm space-y-3 text-xs">
+                <h3 class="text-sm font-bold text-amber-600">📖 Catat Utang / Kasbon</h3>
+                <input type="text" id="kasbonNama" placeholder="Nama Pelanggan" class="w-full border p-2.5 rounded-xl">
+                <input type="number" id="kasbonJumlah" placeholder="Nominal Utang (Rp)" class="w-full border p-2.5 rounded-xl">
+                <button onclick="simpanKasbon()" class="w-full bg-amber-600 text-white py-2.5 rounded-xl font-bold">Simpan Kasbon</button>
+            </div>
+            <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm text-xs space-y-2">
+                <h4 class="font-bold text-gray-700">Daftar Kasbon Aktif</h4>
+                <div id="kasbonList" class="space-y-2"></div>
+            </div>
+        </section>
+
+        <!-- SUB-PAGE: MINI ATM -->
+        <section id="view-atm" class="hidden space-y-4">
+            <button onclick="switchTab('lainnya')" class="text-xs text-teal-600 font-bold mb-2">← Kembali ke Pengaturan</button>
+            <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm space-y-3 text-xs">
+                <h3 class="text-sm font-bold text-blue-600">🏦 Transaksi Mini ATM & PPOB</h3>
+                <select id="atmJenis" class="w-full border p-2.5 rounded-xl bg-gray-50">
+                    <option value="Transfer Bank">Transfer Bank</option>
+                    <option value="Tarik Tunai">Tarik Tunai</option>
+                    <option value="Pulsa/PLN">Token PLN / Pulsa</option>
+                </select>
+                <input type="number" id="atmNominal" placeholder="Nominal Transaksi (Rp)" class="w-full border p-2.5 rounded-xl">
+                <input type="number" id="atmAdmin" placeholder="Biaya Admin Warung (Rp)" value="3000" class="w-full border p-2.5 rounded-xl">
+                <button onclick="simpanAtm()" class="w-full bg-blue-600 text-white py-2.5 rounded-xl font-bold">Proses Transaksi ATM</button>
             </div>
         </section>
 
     </main>
 
+    <!-- BOTTOM NAV BAR (MIRIP FREEKASIR) -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-2 py-2 flex justify-around items-center z-50 shadow-lg text-gray-400">
+        <button onclick="switchTab('beranda')" id="nav-beranda" class="flex flex-col items-center active-tab">
+            <i class="fa-solid fa-house text-base"></i>
+            <span class="text-[10px] mt-1 font-medium">Beranda</span>
+        </button>
+        <button onclick="switchTab('produk')" id="nav-produk" class="flex flex-col items-center">
+            <i class="fa-solid fa-box text-base"></i>
+            <span class="text-[10px] mt-1 font-medium">Produk</span>
+        </button>
+        <!-- Floating Cashier Button -->
+        <button onclick="switchTab('kasir')" id="nav-kasir" class="flex flex-col items-center -mt-5">
+            <div class="w-12 h-12 bg-teal-500 text-white rounded-full flex items-center justify-center shadow-lg text-lg border-4 border-white">
+                <i class="fa-solid fa-cart-shopping"></i>
+            </div>
+            <span class="text-[10px] mt-0.5 font-bold text-teal-600">Kasir</span>
+        </button>
+        <button onclick="switchTab('laporan')" id="nav-laporan" class="flex flex-col items-center">
+            <i class="fa-solid fa-chart-line text-base"></i>
+            <span class="text-[10px] mt-1 font-medium">Laporan</span>
+        </button>
+        <button onclick="switchTab('lainnya')" id="nav-lainnya" class="flex flex-col items-center">
+            <i class="fa-solid fa-gear text-base"></i>
+            <span class="text-[10px] mt-1 font-medium">Lainnya</span>
+        </button>
+    </nav>
+
     <script>
-        // State Storage
+        // Data Stores
         let products = JSON.parse(localStorage.getItem('products')) || [
-            { id: '8991234567', name: 'Es Teh Manis', price: 3000, stock: '' },
-            { id: '8999999999', name: 'Seblak Original Base', price: 8000, stock: '' }
+            { id: '8991001', name: 'Rokok Black Maca', price: 18000, hpp: 16800, stock: 2, unit: 'bungkus' },
+            { id: '8991002', name: 'Katenbat', price: 2000, hpp: 1500, stock: 24, unit: 'pcs' },
+            { id: '8991003', name: 'Telor 1 biji', price: 2000, hpp: 1800, stock: 1000, unit: 'pcs' }
         ];
         let cart = [];
-        let kasbonData = JSON.parse(localStorage.getItem('kasbon')) || [];
-        let atmData = JSON.parse(localStorage.getItem('atm')) || [];
+        let kasbonList = JSON.parse(localStorage.getItem('kasbon')) || [];
+        let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
         let html5QrcodeScanner = null;
 
-        function saveAll() {
+        function saveData() {
             localStorage.setItem('products', JSON.stringify(products));
-            localStorage.setItem('kasbon', JSON.stringify(kasbonData));
-            localStorage.setItem('atm', JSON.stringify(atmData));
+            localStorage.setItem('kasbon', JSON.stringify(kasbonList));
+            localStorage.setItem('transactions', JSON.stringify(transactions));
         }
 
-        function switchTab(tab) {
-            ['kasir', 'seblak', 'kasbon', 'atm', 'produk'].forEach(t => {
-                document.getElementById(`view-${t}`).classList.add('hidden');
-                document.getElementById(`tab-${t}`).classList.remove('border-amber-500', 'text-amber-500');
-                document.getElementById(`tab-${t}`).classList.add('border-transparent', 'text-gray-400');
+        // Navigation Controller
+        function switchTab(tabName) {
+            const tabs = ['beranda', 'produk', 'kasir', 'laporan', 'lainnya', 'seblak', 'kasbon', 'atm'];
+            tabs.forEach(t => {
+                const view = document.getElementById(`view-${t}`);
+                if (view) view.classList.add('hidden');
+                
+                const nav = document.getElementById(`nav-${t}`);
+                if (nav) {
+                    nav.classList.remove('active-tab', 'text-teal-600');
+                    nav.classList.add('text-gray-400');
+                }
             });
-            document.getElementById(`view-${tab}`).classList.remove('hidden');
-            document.getElementById(`tab-${tab}`).classList.add('border-amber-500', 'text-amber-500');
-            document.getElementById(`tab-${tab}`).classList.remove('border-transparent', 'text-gray-400');
+
+            document.getElementById(`view-${tabName}`).classList.remove('hidden');
+            const activeNav = document.getElementById(`nav-${tabName}`);
+            if (activeNav) {
+                activeNav.classList.add('active-tab');
+                activeNav.classList.remove('text-gray-400');
+            }
+
+            renderDashboard();
+            renderProducts();
+            renderKasirGrid();
+            renderLaporan();
         }
 
         // Render Functions
-        function renderProducts() {
-            const list = document.getElementById('productList');
-            list.innerHTML = products.map(p => `
-                <div class="flex justify-between items-center bg-gray-700 p-2 rounded text-sm">
-                    <div>
-                        <div class="font-bold">${p.name}</div>
-                        <div class="text-xs text-gray-400">Rp ${p.price.toLocaleString()} ${p.stock !== '' ? '| Stok: ' + p.stock : ''}</div>
+        function renderDashboard() {
+            const todayOmzet = transactions.reduce((a, b) => a + b.total, 0);
+            document.getElementById('dashTotalOrders').innerText = transactions.length;
+            document.getElementById('dashTotalOmzet').innerText = `Rp ${todayOmzet.toLocaleString()}`;
+
+            const lowStock = products.filter(p => p.stock <= 5);
+            const lowEl = document.getElementById('lowStockList');
+            if (lowStock.length === 0) {
+                lowEl.innerHTML = `<p class="text-gray-400">Semua stok produk aman 👍</p>`;
+            } else {
+                lowEl.innerHTML = lowStock.map(p => `
+                    <div class="flex justify-between items-center bg-red-50 p-2 rounded-xl text-red-700">
+                        <span class="font-bold">${p.name}</span>
+                        <span class="bg-red-200 px-2 py-0.5 rounded-full font-bold">Sisa ${p.stock} ${p.unit || ''}</span>
                     </div>
-                    <button onclick="addToCart('${p.id}')" class="bg-amber-500 text-gray-900 text-xs px-3 py-1 font-bold rounded">+ Tambah</button>
+                `).join('');
+            }
+        }
+
+        function renderProducts() {
+            const query = document.getElementById('searchProductInput').value.toLowerCase();
+            const list = document.getElementById('produkMasterList');
+            const filtered = products.filter(p => p.name.toLowerCase().includes(query) || p.id.includes(query));
+
+            list.innerHTML = filtered.map(p => `
+                <div class="bg-white p-3 rounded-2xl border border-gray-100 shadow-sm flex justify-between items-center text-xs">
+                    <div>
+                        <div class="font-bold text-gray-800">${p.name}</div>
+                        <div class="text-teal-600 font-bold">Rp ${p.price.toLocaleString()} <span class="text-gray-400 font-normal">| HPP: Rp ${p.hpp || 0}</span></div>
+                        <div class="text-gray-400">Stok: ${p.stock} ${p.unit || 'pcs'}</div>
+                    </div>
+                    <button onclick="deleteProduct('${p.id}')" class="text-red-400 hover:text-red-600">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function renderKasirGrid() {
+            const grid = document.getElementById('kasirGrid');
+            grid.innerHTML = products.map(p => `
+                <div onclick="addToCart('${p.id}')" class="bg-gray-50 p-3 rounded-xl border border-gray-200 cursor-pointer text-xs hover:border-teal-500">
+                    <div class="font-bold text-gray-800 truncate">${p.name}</div>
+                    <div class="text-teal-600 font-bold mt-1">Rp ${p.price.toLocaleString()}</div>
+                    <div class="text-[10px] text-gray-400">Stok: ${p.stock}</div>
                 </div>
             `).join('');
         }
 
         function renderCart() {
-            const list = document.getElementById('cartList');
-            const badge = document.getElementById('cartCountBadge');
-            const totalEl = document.getElementById('cartTotal');
+            const list = document.getElementById('cartItemsList');
+            const totalEl = document.getElementById('cartTotalPrice');
+            const countEl = document.getElementById('cartCount');
 
             if (cart.length === 0) {
-                list.innerHTML = `<p class="text-gray-500 text-center py-4">Keranjang masih kosong</p>`;
-                badge.innerText = `Keranjang: 0`;
-                totalEl.innerText = `Rp 0`;
+                list.innerHTML = `<p class="text-gray-400 text-center py-3">Keranjang kosong</p>`;
+                totalEl.innerText = 'Rp 0';
+                countEl.innerText = '0';
                 return;
             }
 
@@ -251,158 +408,126 @@
             list.innerHTML = cart.map((item, idx) => {
                 total += item.price * item.qty;
                 return `
-                    <div class="flex justify-between items-center border-b border-gray-700 pb-2">
+                    <div class="flex justify-between items-center border-b pb-1.5">
                         <div>
-                            <div class="font-semibold text-xs">${item.name}</div>
-                            <div class="text-xs text-amber-400">Rp ${item.price.toLocaleString()} x ${item.qty}</div>
+                            <div class="font-bold text-gray-800">${item.name}</div>
+                            <div class="text-teal-600">Rp ${item.price.toLocaleString()} x ${item.qty}</div>
                         </div>
-                        <button onclick="removeFromCart(${idx})" class="text-red-400 text-xs font-bold px-2">Hapus</button>
+                        <button onclick="removeFromCart(${idx})" class="text-red-400 font-bold">✕</button>
                     </div>
                 `;
             }).join('');
 
-            badge.innerText = `Keranjang: ${cart.reduce((a, b) => a + b.qty, 0)}`;
             totalEl.innerText = `Rp ${total.toLocaleString()}`;
+            countEl.innerText = cart.reduce((a,b) => a + b.qty, 0);
         }
 
-        function renderKasbon() {
-            const list = document.getElementById('kasbonList');
-            if (kasbonData.length === 0) {
-                list.innerHTML = `<p class="text-gray-500 py-2">Tidak ada catatan utang.</p>`;
-                return;
-            }
-            list.innerHTML = kasbonData.map((k, idx) => `
-                <div class="flex justify-between items-center bg-gray-700 p-2 rounded">
-                    <div>
-                        <span class="font-bold text-amber-400">${k.nama}</span>
-                        <div class="text-xs">Tunggakan: Rp ${k.jumlah.toLocaleString()}</div>
-                    </div>
-                    <button onclick="lunasKasbon(${idx})" class="bg-emerald-600 text-xs text-white px-2 py-1 rounded font-bold">Lunas</button>
-                </div>
-            `).join('');
+        function renderLaporan() {
+            const totalOmzet = transactions.reduce((a,b) => a + b.total, 0);
+            const totalHpp = transactions.reduce((a,b) => a + (b.hppTotal || 0), 0);
+            const laba = totalOmzet - totalHpp;
+
+            document.getElementById('lapOmzet').innerText = `Rp ${totalOmzet.toLocaleString()}`;
+            document.getElementById('lapHpp').innerText = `Rp ${totalHpp.toLocaleString()}`;
+            document.getElementById('lapLaba').innerText = `Rp ${laba.toLocaleString()}`;
         }
 
-        // Action Handlers
+        // Actions
         function addToCart(id) {
             const prod = products.find(p => p.id === id);
             if (!prod) return;
-            const existing = cart.find(c => c.id === id);
-            if (existing) {
-                existing.qty++;
-            } else {
-                cart.push({ id: prod.id, name: prod.name, price: prod.price, qty: 1 });
-            }
+            const exist = cart.find(c => c.id === id);
+            if (exist) { exist.qty++; }
+            else { cart.push({ id: prod.id, name: prod.name, price: prod.price, hpp: prod.hpp || 0, qty: 1 }); }
             renderCart();
         }
 
-        function removeFromCart(index) {
-            cart.splice(index, 1);
+        function removeFromCart(idx) {
+            cart.splice(idx, 1);
             renderCart();
         }
 
         function addSeblakToCart() {
-            const pedas = document.getElementById('seblakPedas').value;
-            const checkboxes = document.querySelectorAll('.topping-check:checked');
-            
-            let basePrice = 8000;
+            const levelVal = document.getElementById('seblakLevel').value.split(':');
+            let basePrice = 8000 + parseInt(levelVal[1]);
             let toppings = [];
-            
-            if (pedas.includes('+Rp 1.000')) basePrice += 1000;
 
-            checkboxes.forEach(cb => {
+            document.querySelectorAll('.top-check:checked').forEach(cb => {
                 const [nama, harga] = cb.value.split(':');
                 basePrice += parseInt(harga);
                 toppings.push(nama);
             });
 
-            const seblakName = `Seblak (${pedas.split(' ')[0]}) ${toppings.length ? '+ ' + toppings.join(',') : ''}`;
-            
-            cart.push({
-                id: 'seblak-' + Date.now(),
-                name: seblakName,
-                price: basePrice,
-                qty: 1
-            });
-
+            const name = `Seblak (${levelVal[0].split(' ')[0]}) ${toppings.length ? '+ ' + toppings.join(',') : ''}`;
+            cart.push({ id: 'seblak-' + Date.now(), name, price: basePrice, hpp: 4000, qty: 1 });
             renderCart();
             switchTab('kasir');
         }
 
         function checkout() {
-            if (cart.length === 0) return alert('Keranjang masih kosong!');
-            alert('Transaksi Berhasil Disimpan!');
+            if (cart.length === 0) return alert('Keranjang kosong!');
+            const total = cart.reduce((a,b) => a + (b.price * b.qty), 0);
+            const hppTotal = cart.reduce((a,b) => a + (b.hpp * b.qty), 0);
+
+            transactions.push({ id: Date.now(), total, hppTotal, date: new Date().toLocaleTimeString() });
+            
+            // Deduct Stock
+            cart.forEach(item => {
+                const p = products.find(x => x.id === item.id);
+                if (p && p.stock !== '') p.stock = Math.max(0, p.stock - item.qty);
+            });
+
+            saveData();
             cart = [];
             renderCart();
+            alert('Transaksi Berhasil!');
+            switchTab('beranda');
         }
 
-        function tambahKasbon() {
+        function simpanKasbon() {
             const nama = document.getElementById('kasbonNama').value;
             const jumlah = parseInt(document.getElementById('kasbonJumlah').value);
-            if (!nama || !jumlah) return alert('Lengkapi nama dan jumlah utang!');
-
-            kasbonData.push({ nama, jumlah });
-            saveAll();
+            if (!nama || !jumlah) return alert('Lengkapi data kasbon!');
+            
+            kasbonList.push({ nama, jumlah });
+            saveData();
             renderKasbon();
             document.getElementById('kasbonNama').value = '';
             document.getElementById('kasbonJumlah').value = '';
         }
 
-        function lunasKasbon(idx) {
-            kasbonData.splice(idx, 1);
-            saveAll();
-            renderKasbon();
-        }
-
-        function catatAtm() {
-            const jenis = document.getElementById('atmJenis').value;
-            const nominal = parseInt(document.getElementById('atmNominal').value);
-            const admin = parseInt(document.getElementById('atmAdmin').value) || 0;
-
-            if (!nominal) return alert('Isi nominal transaksi!');
-
-            atmData.unshift({ jenis, nominal, admin, date: new Date().toLocaleTimeString() });
-            saveAll();
-            renderAtm();
-            document.getElementById('atmNominal').value = '';
-        }
-
-        function renderAtm() {
-            const list = document.getElementById('atmHistory');
-            if (atmData.length === 0) {
-                list.innerHTML = `<p class="text-center py-2">Belum ada transaksi ATM</p>`;
-                return;
-            }
-            list.innerHTML = atmData.map(a => `
-                <div class="bg-gray-700 p-2 rounded flex justify-between text-xs">
+        function renderKasbon() {
+            const list = document.getElementById('kasbonList');
+            list.innerHTML = kasbonList.map((k, idx) => `
+                <div class="flex justify-between items-center bg-gray-50 p-2 rounded-xl">
                     <div>
-                        <span class="font-bold text-blue-400">${a.jenis}</span> - Rp ${a.nominal.toLocaleString()}
-                        <div class="text-gray-400">Admin Warung: Rp ${a.admin.toLocaleString()}</div>
+                        <span class="font-bold">${k.nama}</span>
+                        <div class="text-amber-600 font-bold">Utang: Rp ${k.jumlah.toLocaleString()}</div>
                     </div>
-                    <span class="text-gray-400">${a.date}</span>
+                    <button onclick="kasbonList.splice(${idx},1); saveData(); renderKasbon();" class="bg-emerald-600 text-white px-2 py-1 rounded-lg text-[10px] font-bold">Lunas</button>
                 </div>
             `).join('');
         }
 
-        function simpanProduk() {
-            const barcode = document.getElementById('newBarcode').value || Date.now().toString();
-            const name = document.getElementById('newName').value;
-            const price = parseInt(document.getElementById('newPrice').value);
-            const stock = document.getElementById('newStock').value;
+        function openAddProductModal() {
+            const name = prompt('Nama Produk:');
+            const price = parseInt(prompt('Harga Jual (Rp):'));
+            const hpp = parseInt(prompt('Harga Modal/HPP (Rp):') || 0);
+            const stock = parseInt(prompt('Jumlah Stok:') || 0);
 
-            if (!name || !price) return alert('Isi nama dan harga barang!');
-
-            products.push({ id: barcode, name, price, stock });
-            saveAll();
-            renderProducts();
-
-            document.getElementById('newBarcode').value = '';
-            document.getElementById('newName').value = '';
-            document.getElementById('newPrice').value = '';
-            document.getElementById('newStock').value = '';
-            alert('Produk berhasil ditambahkan!');
+            if (name && price) {
+                products.push({ id: Date.now().toString(), name, price, hpp, stock, unit: 'pcs' });
+                saveData();
+                renderProducts();
+            }
         }
 
-        // Camera Barcode Scanner
+        function deleteProduct(id) {
+            products = products.filter(p => p.id !== id);
+            saveData();
+            renderProducts();
+        }
+
         function toggleScanner() {
             const readerDiv = document.getElementById('reader');
             if (readerDiv.classList.contains('hidden')) {
@@ -420,10 +545,8 @@
         }
 
         // Init
-        renderProducts();
-        renderCart();
+        switchTab('beranda');
         renderKasbon();
-        renderAtm();
     </script>
 </body>
 </html>
