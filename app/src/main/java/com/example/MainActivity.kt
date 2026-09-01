@@ -1,55 +1,32 @@
 package com.example
 
 import android.os.Bundle
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.animation.*
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.ui.components.*
-import com.example.ui.screens.*
-import com.example.ui.theme.*
-import com.example.ui.viewmodel.MainTab
-import com.example.ui.viewmodel.WarungViewModel
-import kotlinx.coroutines.delay
+import androidx.compose.ui.viewinterop.AndroidView
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
-            WarungSmartApp()
+            AndroidView(
+                modifier = Modifier.fillMaxSize(),
+                factory = { context ->
+                    WebView(context).apply {
+                        webViewClient = WebViewClient()
+                        settings.javaScriptEnabled = true
+                        settings.domStorageEnabled = true
+                        loadUrl("https://warung-smart-pos.vercel.app")
+                    }
+                }
+            )
         }
     }
 }
-
-@Composable
-fun WarungSmartApp(
-    viewModel: WarungViewModel = viewModel()
-) {
-    val selectedTheme by viewModel.selectedTheme.collectAsState()
-    val currentTab by viewModel.currentTab.collectAsState()
-    val storeName by viewModel.storeName.collectAsState()
-    val cashierName by viewModel.cashierName.collectAsState()
-    val storeAddress by viewModel.storeAddress.collectAsState()
-    val storeEmoji by viewModel.storeEmoji.collectAsState()
-
-    // Dialog & Modal states from ViewModel
-    val showSeblakDialog by viewModel.showSeblakDialog.collectAsState()
-    val activeSeblakProduct by viewModel.activeSeblakProduct.collectAsState()
-    val showPaymentDialog by viewModel.showPaymentDialog.collectAsState()
     val showReceiptDialog by viewModel.showReceiptDialog.collectAsState()
     val activeReceipt by viewModel.activeReceipt.collectAsState()
     val showHoldDialog by viewModel.showHoldDialog.collectAsState()
