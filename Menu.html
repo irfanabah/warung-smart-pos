@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Menu Warung Bismillah</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+    body { background: #f8fafc; color: #334155; padding-bottom: 80px; }
+    .header { background: #0d9488; color: #fff; padding: 16px; text-align: center; border-radius: 0 0 16px 16px; }
+    .header h2 { font-size: 18px; margin-bottom: 4px; }
+    .header p { font-size: 12px; opacity: 0.9; }
+    
+    .container { padding: 16px; max-width: 480px; margin: 0 auto; }
+    .menu-card { background: #fff; border-radius: 12px; padding: 12px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #e2e8f0; }
+    .menu-info h4 { font-size: 14px; margin-bottom: 4px; }
+    .menu-info p { font-size: 13px; font-weight: bold; color: #0d9488; }
+    
+    .btn-add { background: #0d9488; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+    .btn-add:active { transform: scale(0.95); }
+
+    .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1px solid #e2e8f0; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; max-width: 480px; margin: 0 auto; }
+    .btn-order { background: #0d9488; color: #fff; border: none; padding: 10px 18px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h2>WARUNG BISMILLAH</h2>
+    <p id="label-meja">Memuat Nomor Meja...</p>
+  </div>
+
+  <div class="container" id="produk-list">
+    <p style="text-align: center; font-size: 12px; color: #64748b;">Memuat daftar menu...</p>
+  </div>
+
+  <div class="bottom-bar">
+    <div>
+      <span style="font-size: 11px; color: #64748b;">Total Pesanan:</span>
+      <div id="total-harga" style="font-weight: bold; color: #0d9488;">Rp 0</div>
+    </div>
+    <button class="btn-order" onclick="kirimPesanan()">Kirim Pesanan</button>
+  </div>
+
+  <script>
+    // 1. ISI DENGAN URL & ANON KEY SUPABASE KAMU
+    const SUPABASE_URL = "https://PROJECT_KAMU.supabase.co";
+    const SUPABASE_ANON_KEY = "KEY_ANON_KAMU";
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // 2. Ambil Nomor Meja dari Parameter URL (misal: menu.html?meja=1)
+    const urlParams = new URLSearchParams(window.location.search);
+    const nomorMeja = parseInt(urlParams.get('meja')) || 1;
+    document.getElementById('label-meja').innerText = `Pemesanan dari MEJA ${nomorMeja}`;
+
+    let cart = [];
+    let produkData = [];
+
+    // 3. Load Produk yang Tersedia untuk QR
+    async function fetchMenu() {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('is_available_for_qr', true);
+
+      if (error) {
+        console.error("Gagal mengambil menu:", error);
+        return;
+      }
+
+      produkData = data;
+      const listEl = document.getElementById('produk-list');
+      
+      if(data.length === 0) {
+        listEl.innerHTML = `<p style="text-align:center;">Belum ada menu makanan/minuman yang diaktifkan.</p>`;
+        return;
+      }
+
+      listEl.innerHTML = data.map(p => `
+        <div class="menu-card">
+          <div class="menu-info">
+            <h4>${p.nama}</h4>
+            <p>Rp ${p.harga.toLocaleString('id-ID')}</p>
+          </div>
+          <button class="btn-add" onclick="tambahItem(${p.id})">+ Tambah</button>
+        </div>
+      `).join('');
+    }
+
+    function tambahItem(id) {
+      const p = produkData.find(x => x.id === id);
+      if(!p) return;
+      
+      const exist = cart.find(x => x.id === id);
+      if(exist) { exist.qty++; }
+      else { cart.push({ id: p.id, nama: p.nama, harga: p.harga, qty: 1 }); }
+      
+      updateCartUI();
+    }
+
+    function updateCartUI() {
+      const total = cart.reduce((sum, item) => sum + (item.harga * item.qty), 0);
+      document.getElementById('total-harga').innerText = `Rp ${total.toLocaleString('id-ID')}`;
+    }
+
+    // 4. Kirim Pesanan ke Tabel 'orders' di Supabase
+    async function kirimPesanan() {
+      if(cart.length === 0) {
+        alert("Pilih minimal 1 menu makanan/minuman!");
+        return;
+      }
+
+      const total = cart.reduce((sum, item) => sum + (item.harga * item.qty), 0);
+
+      const { data, error } = await supabase
+        .from('orders')
+        .insert([
+          {
+            table_number: nomorMeja,
+            items: cart,
+            total_amount: total,
+            status: 'pending',
+            payment_status: 'unpaid'
+          }
+        ]);
+
+      if(error) {
+        alert("Gagal mengirim pesanan. Coba lagi.");
+        console.error(error);
+      } else {
+        alert(`Pesanan Meja ${nomorMeja} Berhasil Dikirim! Mohon tunggu pesanan Anda disiapkan.`);
+        cart = [];
+        updateCartUI();
+      }
+    }
+
+    window.onload = fetchMenu;
+  </script>
+</body>
+</html>
