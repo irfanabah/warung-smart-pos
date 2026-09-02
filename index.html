@@ -298,6 +298,7 @@
 
       <!-- HALAMAN BERANDA -->
       <div id="page-beranda" class="page active">
+        <!-- Ringkasan Penjualan -->
         <div class="summary-card">
           <div class="summary-item">
             <label>Total Penjualan Hari Ini</label>
@@ -309,6 +310,7 @@
           </div>
         </div>
 
+        <!-- Menu Tombol Utama -->
         <div class="menu-grid">
           <div class="menu-card" onclick="switchTab('Kasir')">
             <div class="icon-wrapper" style="background-color: #e6fffa; color: #0d9488;">
@@ -316,13 +318,13 @@
             </div>
             <span>Kasir</span>
           </div>
-          <div class="menu-card" onclick="alert('Menu Seblak dipilih')">
+          <div class="menu-card" onclick="alert('Membuka menu: Seblak')">
             <div class="icon-wrapper" style="background-color: #fff7ed; color: #ea580c;">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 3z"/></svg>
             </div>
             <span>Seblak</span>
           </div>
-          <div class="menu-card" onclick="alert('Menu Kasbon')">
+          <div class="menu-card" onclick="switchTab('Kasbon')">
             <div class="icon-wrapper" style="background-color: #fefce8; color: #ca8a04;">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>
             </div>
@@ -336,6 +338,7 @@
           </div>
         </div>
 
+        <!-- Section Backup & Restore JSON -->
         <div class="section-card">
           <div class="section-title">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/></svg>
@@ -352,6 +355,15 @@
             </button>
             <input type="file" id="importFile" style="display:none;" onchange="importDataJSON(event)" accept=".json">
           </div>
+        </div>
+
+        <!-- Section Peringatan Stok (Dipertahankan) -->
+        <div class="section-card">
+          <div class="section-title" style="color: #d97706;">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>
+            PERINGATAN STOK MENIPIS
+          </div>
+          <p style="font-size: 12px; color: #666;" id="stok-status">Semua stok aman.</p>
         </div>
       </div>
 
@@ -373,6 +385,7 @@
             <option value="Transfer">Transfer</option>
           </select>
 
+          <!-- Kalkulator & Tombol Uang Cepat -->
           <div id="cash-section">
             <label style="font-size: 12px; font-weight: 600; margin-top: 10px; display:block;">Uang Diterima:</label>
             <input type="number" id="uangDiterima" class="input-field" value="0" oninput="hitungkembalian()">
@@ -416,6 +429,7 @@
         </div>
       </div>
 
+      <!-- HALAMAN DUMMY -->
       <div id="page-produk" class="page"><div class="section-card">Halaman Kelola Produk & Stok</div></div>
       <div id="page-kasbon" class="page"><div class="section-card">Halaman Catatan Kasbon</div></div>
 
@@ -476,16 +490,25 @@
         { id: 1, tanggal: '2026-09-02', total: 35000, hpp: 20000, metode: 'Tunai', bayar: 50000, kembalian: 15000 }
       ],
       produk: [
-        { id: 1, nama: 'Seblak Spesial', harga: 15000, hpp: 9000, stok: 20 }
+        { id: 1, nama: 'Seblak Spesial', harga: 15000, hpp: 9000, stok: 2 }
       ]
     };
 
     function switchTab(tabName) {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      
+      const navItems = document.querySelectorAll('.nav-item');
+      navItems.forEach(n => n.classList.remove('active'));
 
       const targetPage = document.getElementById(`page-${tabName.toLowerCase()}`);
       if(targetPage) targetPage.classList.add('active');
+
+      // Memberi status aktif pada tombol navigasi bawah
+      navItems.forEach(item => {
+        if(item.innerText.trim().toLowerCase() === tabName.toLowerCase()) {
+          item.classList.add('active');
+        }
+      });
 
       if(tabName === 'Laporan') hitungLaporan();
     }
@@ -566,6 +589,17 @@
       const totalPenjualan = appData.transaksi.reduce((acc, curr) => acc + curr.total, 0);
       document.getElementById('total-penjualan').innerText = `Rp ${totalPenjualan.toLocaleString('id-ID')}`;
       document.getElementById('total-transaksi').innerText = appData.transaksi.length;
+
+      // Update peringatan stok
+      const menipis = appData.produk.filter(p => p.stok <= 5);
+      const stokEl = document.getElementById('stok-status');
+      if(menipis.length > 0) {
+        stokEl.innerText = `${menipis.length} produk stoknya hampir habis!`;
+        stokEl.style.color = '#dc2626';
+      } else {
+        stokEl.innerText = 'Semua stok aman.';
+        stokEl.style.color = '#666';
+      }
     }
 
     function hitungLaporan() {
