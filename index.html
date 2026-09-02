@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kasir Warung</title>
+  <title>Kasir Warung Super</title>
+  <!-- Library Scan Barcode Kamera bawaan Web -->
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { background-color: #f4f6f8; color: #333; display: flex; justify-content: center; min-height: 100vh; }
@@ -12,18 +14,16 @@
     .page { display: none; }
     .page.active { display: block; }
 
-    /* Component Cards & Typography */
+    /* UI Cards & Elements */
     .card { background: #fff; border-radius: 12px; padding: 14px; margin-bottom: 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.04); border: 1px solid #eef2f5; }
     .title { font-size: 11px; font-weight: 700; color: #64748b; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; letter-spacing: 0.5px; text-transform: uppercase; }
     .title svg { width: 14px; height: 14px; }
     
-    /* Summary Card */
     .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .summary-box { background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; }
     .summary-box label { font-size: 11px; color: #64748b; display: block; }
     .summary-box div { font-size: 16px; font-weight: bold; color: #0d9488; margin-top: 2px; }
 
-    /* Menu Grid */
     .menu-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
     .menu-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 6px; display: flex; flex-direction: column; align-items: center; cursor: pointer; user-select: none; }
     .menu-card:active { transform: scale(0.96); background: #f8fafc; }
@@ -31,7 +31,7 @@
     .icon-wrap svg { width: 20px; height: 20px; }
     .menu-card span { font-size: 11px; font-weight: 600; color: #334155; }
 
-    /* Form Elements & Buttons */
+    /* Form & Input Fields */
     .input-group { margin-bottom: 10px; }
     .input-group label { font-size: 11px; font-weight: 600; color: #475569; display: block; margin-bottom: 4px; }
     .input-field, select { width: 100%; padding: 9px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; outline: none; background: #fff; }
@@ -44,8 +44,14 @@
     .btn-danger { background: #ef4444; color: #fff; }
     .btn-excel { background: #10b981; color: #fff; }
     .btn-warning { background: #f59e0b; color: #fff; }
+    .btn-scan { background: #3b82f6; color: #fff; }
 
-    /* Filters & Lists */
+    /* Custom Item & Camera Barcode Styling */
+    .search-barcode-box { display: flex; gap: 6px; margin-bottom: 10px; }
+    .img-preview { width: 50px; height: 50px; border-radius: 6px; object-fit: cover; border: 1px solid #cbd5e1; display: none; }
+    .item-img-thumb { width: 36px; height: 36px; border-radius: 4px; object-fit: cover; background: #e2e8f0; margin-right: 8px; flex-shrink: 0; }
+
+    /* Navigation Bar & Lists */
     .filter-scroll { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 10px; }
     .filter-btn { padding: 5px 10px; border-radius: 16px; background: #e2e8f0; font-size: 11px; font-weight: 600; white-space: nowrap; border: none; cursor: pointer; }
     .filter-btn.active { background: #0d9488; color: #fff; }
@@ -53,18 +59,16 @@
     .item-list { display: flex; flex-direction: column; gap: 8px; max-height: 240px; overflow-y: auto; }
     .list-row { display: flex; justify-content: space-between; align-items: center; padding: 8px; background: #f8fafc; border-radius: 6px; border: 1px solid #edf2f7; font-size: 12px; }
 
-    /* Quick Cash Buttons */
     .quick-cash { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 8px 0; }
     .btn-cash { padding: 7px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; }
 
-    /* Nav Bar */
     .bottom-nav { position: fixed; bottom: 0; width: 100%; max-width: 480px; height: 65px; background: #fff; border-top: 1px solid #e2e8f0; display: grid; grid-template-columns: repeat(5, 1fr); z-index: 100; }
     .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; background: none; border: none; color: #94a3b8; font-size: 9px; gap: 3px; cursor: pointer; }
     .nav-item svg { width: 18px; height: 18px; stroke: currentColor; }
     .nav-item.active { color: #0d9488; font-weight: 600; }
     .nav-item.fab .fab-btn { width: 42px; height: 42px; background: #0d9488; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-top: -20px; box-shadow: 0 4px 8px rgba(13,148,136,0.3); }
 
-    /* Modal */
+    /* Modals & Receipts */
     .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 200; padding: 16px; }
     .modal.active { display: flex; }
     .modal-body { background: #fff; width: 100%; max-width: 360px; border-radius: 10px; padding: 16px; max-height: 90vh; overflow-y: auto; }
@@ -80,7 +84,7 @@
 <div class="app-container">
   <div class="content">
 
-    <!-- 1. HALAMAN BERANDA -->
+    <!-- 1. BERANDA -->
     <div id="page-beranda" class="page active">
       <div class="card">
         <div class="summary-grid">
@@ -124,15 +128,24 @@
       </div>
 
       <div class="card">
-        <div class="title" style="color:#d97706;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>PERINGATAN STOK MENIPIS</div>
+        <div class="title" style="color:#d97706;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 1 2.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>PERINGATAN STOK MENIPIS</div>
         <div id="dash-stok-warning" style="font-size:12px; color:#666;">Semua stok dalam keadaan aman.</div>
       </div>
     </div>
 
-    <!-- 2. HALAMAN KASIR -->
+    <!-- 2. HALAMAN KASIR (TRANSAKSI + SCAN + ITEM KAMERA) -->
     <div id="page-kasir" class="page">
       <div class="card">
-        <div class="title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>KATALOG PRODUK</div>
+        <div class="title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>KATALOG & PEMINDAN BARCODE</div>
+        
+        <!-- BAR PENCARIAN & TOMBOL SCAN -->
+        <div class="search-barcode-box">
+          <input type="text" id="kasir-search" class="input-field" placeholder="Ketik nama atau kode barcode..." oninput="renderKasirProduk()">
+          <button class="btn btn-scan" onclick="bukaModalScanner('kasir')" style="white-space:nowrap;">📷 Scan</button>
+        </div>
+
+        <button class="btn btn-warning" style="width:100%; margin-bottom:10px;" onclick="bukaModalFotoCustomItem()">📷 Foto Barang Cepat (Tanpa Barcode)</button>
+
         <div class="filter-scroll" id="kasir-kategori-filter"></div>
         <div class="item-list" id="kasir-produk-list"></div>
       </div>
@@ -189,7 +202,7 @@
       </div>
     </div>
 
-    <!-- 4. KELOLA PRODUK & KATEGORI -->
+    <!-- 4. KELOLA PRODUK (SCAN BARCODE & FOTO KAMERA) -->
     <div id="page-produk" class="page">
       <div class="card">
         <div class="title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>KELOLA KATEGORI</div>
@@ -202,6 +215,24 @@
 
       <div class="card">
         <div class="title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>TAMBAH / EDIT PRODUK</div>
+        
+        <div class="input-group">
+          <label>Kode Barcode / SKU Barang</label>
+          <div style="display:flex; gap:6px;">
+            <input type="text" id="p-barcode" class="input-field" placeholder="Scan/ketik barcode">
+            <button class="btn btn-scan" onclick="bukaModalScanner('produk')" style="white-space:nowrap;">📷 Scan</button>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label>Foto Produk (Kamera / Galeri)</label>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <input type="file" id="p-foto-input" accept="image/*" capture="environment" style="display:none" onchange="previewFotoProduk(event)">
+            <button class="btn btn-secondary" onclick="document.getElementById('p-foto-input').click()">📷 Ambil Foto Produk</button>
+            <img id="p-foto-img" class="img-preview" src="" alt="Preview">
+          </div>
+        </div>
+
         <div class="input-group"><label>Nama Produk</label><input type="text" id="p-nama" class="input-field"></div>
         <div class="input-group"><label>Kategori</label><select id="p-kategori" class="input-field"></select></div>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
@@ -299,6 +330,36 @@
   </nav>
 </div>
 
+<!-- MODAL SCANNER BARCODE KAMERA -->
+<div class="modal" id="modalScanner">
+  <div class="modal-body" style="text-align:center;">
+    <div class="title" style="justify-content:center;">PEMINDAN BARCODE KAMERA</div>
+    <div id="reader" style="width:100%; max-width:300px; margin:0 auto 10px auto;"></div>
+    <button class="btn btn-danger" style="width:100%" onclick="tutupModalScanner()">Tutup Scanner</button>
+  </div>
+</div>
+
+<!-- MODAL FOTO BARANG CUSTOM (TANPA BARCODE) -->
+<div class="modal" id="modalFotoCustomItem">
+  <div class="modal-body">
+    <div class="title">TRANSAKSI CEPT BARANG CUSTOM</div>
+    <div class="input-group">
+      <label>Foto Barang (Opsional)</label>
+      <input type="file" id="custom-foto-input" accept="image/*" capture="environment" style="display:none" onchange="previewCustomFoto(event)">
+      <div style="display:flex; gap:8px; align-items:center;">
+        <button class="btn btn-secondary" onclick="document.getElementById('custom-foto-input').click()">📷 Ambil Foto Barang</button>
+        <img id="custom-foto-img" class="img-preview" src="" alt="Preview">
+      </div>
+    </div>
+    <div class="input-group"><label>Nama Barang Custom</label><input type="text" id="custom-nama" class="input-field" placeholder="Misal: Kerupuk Kaleng A"></div>
+    <div class="input-group"><label>Harga Jual (Rp)</label><input type="number" id="custom-harga" class="input-field" placeholder="Nominal harga"></div>
+    <div class="btn-grid">
+      <button class="btn btn-secondary" onclick="document.getElementById('modalFotoCustomItem').classList.remove('active')">Batal</button>
+      <button class="btn btn-primary" onclick="tambahCustomItemKeCart()">Masuk Keranjang</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL STRUK -->
 <div class="modal" id="modalStruk">
   <div class="modal-body">
@@ -348,7 +409,6 @@
 </div>
 
 <script>
-  // STATE APLIKASI UTAMA
   let appData = {
     config: {
       namaToko: "WARUNG BISMILLAH",
@@ -361,8 +421,8 @@
     },
     kategori: ["Semua", "Seblak", "Minuman", "Rokok", "Sembako"],
     produk: [
-      { id: 1, nama: "Filter Garam 12", kategori: "Rokok", harga: 24000, hpp: 21000, stok: 10, isiBatang: 12, hargaBatang: 2200, stokBatang: 5 },
-      { id: 2, nama: "Es Teh Manis", kategori: "Minuman", harga: 5000, hpp: 2500, stok: null }
+      { id: 1, barcode: "899990800001", foto: "", nama: "Filter Garam 12", kategori: "Rokok", harga: 24000, hpp: 21000, stok: 10, isiBatang: 12, hargaBatang: 2200, stokBatang: 5 },
+      { id: 2, barcode: "899100110022", foto: "", nama: "Es Teh Manis", kategori: "Minuman", harga: 5000, hpp: 2500, stok: null }
     ],
     cart: [],
     transaksi: [],
@@ -371,8 +431,11 @@
 
   let activeKasirKategori = "Semua";
   let activeCicilId = null;
+  let html5QrcodeScanner = null;
+  let scanTarget = "kasir"; 
+  let tempFotoProduct = "";
+  let tempFotoCustom = "";
 
-  // INIT
   window.onload = function() {
     loadLocal();
     initSettingsUI();
@@ -410,6 +473,111 @@
     if(tabName === 'Kasbon') renderKasbon();
     if(tabName === 'Laporan') renderLaporan();
     if(tabName === 'Setting') initSettingsUI();
+  }
+
+  // --- PEMINDAN BARCODE KAMERA ---
+  function bukaModalScanner(target) {
+    scanTarget = target;
+    document.getElementById('modalScanner').classList.add('active');
+    
+    html5QrcodeScanner = new Html5Qrcode("reader");
+    html5QrcodeScanner.start(
+      { facingMode: "environment" },
+      { fps: 10, qrbox: { width: 250, height: 150 } },
+      (decodedText) => {
+        onScanSuccess(decodedText);
+      },
+      (errorMessage) => {}
+    ).catch(err => {
+      alert("Kamera tidak dapat diakses atau izin ditolak.");
+      tutupModalScanner();
+    });
+  }
+
+  function onScanSuccess(decodedText) {
+    tutupModalScanner();
+    if(scanTarget === 'kasir') {
+      const p = appData.produk.find(x => x.barcode === decodedText);
+      if(p) {
+        addToCart(p.id, 'normal');
+        alert(`Produk ditemukan: ${p.nama}`);
+      } else {
+        alert(`Barcode ${decodedText} belum terdaftar di menu Produk.`);
+      }
+    } else if(scanTarget === 'produk') {
+      document.getElementById('p-barcode').value = decodedText;
+      alert(`Barcode berhasil di-scan: ${decodedText}`);
+    }
+  }
+
+  function tutupModalScanner() {
+    if(html5QrcodeScanner) {
+      html5QrcodeScanner.stop().then(() => {
+        html5QrcodeScanner.clear();
+        document.getElementById('modalScanner').classList.remove('active');
+      }).catch(() => {
+        document.getElementById('modalScanner').classList.remove('active');
+      });
+    } else {
+      document.getElementById('modalScanner').classList.remove('active');
+    }
+  }
+
+  // --- ITEM CUSTOM KAMERA ---
+  function bukaModalFotoCustomItem() {
+    tempFotoCustom = "";
+    document.getElementById('custom-nama').value = "";
+    document.getElementById('custom-harga').value = "";
+    document.getElementById('custom-foto-img').style.display = 'none';
+    document.getElementById('modalFotoCustomItem').classList.add('active');
+  }
+
+  function previewCustomFoto(e) {
+    const file = e.target.files[0];
+    if(file) {
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        tempFotoCustom = evt.target.result;
+        const img = document.getElementById('custom-foto-img');
+        img.src = tempFotoCustom;
+        img.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  function tambahCustomItemKeCart() {
+    const nama = document.getElementById('custom-nama').value.trim() || "Item Fast Custom";
+    const harga = parseFloat(document.getElementById('custom-harga').value) || 0;
+    if(harga <= 0) { alert("Harga barang custom harus diisi!"); return; }
+
+    appData.cart.push({
+      produkId: Date.now(),
+      nama: nama,
+      harga: harga,
+      hpp: harga * (appData.config.defHppPct / 100),
+      qty: 1,
+      mode: 'custom',
+      foto: tempFotoCustom
+    });
+
+    document.getElementById('modalFotoCustomItem').classList.remove('active');
+    renderCart();
+  }
+
+  // --- FOTO PRODUK BARU ---
+  function previewFotoProduk(e) {
+    const file = e.target.files[0];
+    if(file) {
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        tempFotoProduct = evt.target.result;
+        const img = document.getElementById('p-foto-img');
+        img.src = tempFotoProduct;
+        img.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
   }
 
   // BERANDA
@@ -472,23 +640,33 @@
 
   function renderKasirProduk() {
     const list = document.getElementById('kasir-produk-list');
+    const q = document.getElementById('kasir-search').value.toLowerCase();
+    
     let items = appData.produk;
     if(activeKasirKategori !== 'Semua') {
       items = items.filter(p => p.kategori === activeKasirKategori);
     }
+    if(q) {
+      items = items.filter(p => p.nama.toLowerCase().includes(q) || (p.barcode && p.barcode.includes(q)));
+    }
 
     list.innerHTML = items.map(p => {
       const isRokok = p.isiBatang && p.hargaBatang;
+      const imgTag = p.foto ? `<img src="${p.foto}" class="item-img-thumb">` : `<div class="item-img-thumb"></div>`;
       return `
         <div class="list-row">
-          <div>
-            <b>${p.nama}</b>
-            <div style="font-size:10px; color:#666;">Rp ${p.harga.toLocaleString('id-ID')} | Stok: ${p.stok === null ? '∞':p.stok}</div>
+          <div style="display:flex; align-items:center;">
+            ${imgTag}
+            <div>
+              <b>${p.nama}</b>
+              <div style="font-size:10px; color:#666;">Rp ${p.harga.toLocaleString('id-ID')} | Stok: ${p.stok === null ? '∞':p.stok}</div>
+              ${p.barcode ? `<div style="font-size:9px; color:#94a3b8;">BC: ${p.barcode}</div>`:''}
+            </div>
           </div>
           <div>
             ${isRokok ? `
               <button class="btn btn-secondary" style="padding:4px 6px; font-size:10px;" onclick="addToCart(${p.id}, 'bungkus')">+ Bungkus</button>
-              <button class="btn btn-secondary" style="padding:4px 6px; font-size:10px; margin-top:2px;" onclick="addToCart(${p.id}, 'batang')">+ Batang (Sisa:${p.stokBatang||0})</button>
+              <button class="btn btn-secondary" style="padding:4px 6px; font-size:10px; margin-top:2px;" onclick="addToCart(${p.id}, 'batang')">+ Batang (${p.stokBatang||0})</button>
             ` : `
               <button class="btn btn-primary" style="padding:4px 8px; font-size:10px;" onclick="addToCart(${p.id}, 'normal')">+ Tambah</button>
             `}
@@ -630,7 +808,6 @@
 
     const totalHpp = appData.cart.reduce((sum, item) => sum + (item.hpp * item.qty), 0);
 
-    // Potong Stok
     appData.cart.forEach(c => {
       const p = appData.produk.find(x => x.id === c.produkId);
       if(p) {
@@ -717,6 +894,7 @@
 
   // MASTER PRODUK
   function simpanProduk() {
+    const barcode = document.getElementById('p-barcode').value.trim();
     const nama = document.getElementById('p-nama').value.trim();
     const kategori = document.getElementById('p-kategori').value;
     const harga = parseFloat(document.getElementById('p-harga').value) || 0;
@@ -732,6 +910,8 @@
 
     appData.produk.push({
       id: Date.now(),
+      barcode: barcode,
+      foto: tempFotoProduct,
       nama: nama,
       kategori: kategori,
       harga: harga,
@@ -744,24 +924,34 @@
 
     saveLocal(); renderMasterProduk();
     alert("Produk berhasil disimpan!");
+    document.getElementById('p-barcode').value = '';
     document.getElementById('p-nama').value = '';
     document.getElementById('p-harga').value = '';
     document.getElementById('p-hpp').value = '';
     document.getElementById('p-stok').value = '';
+    document.getElementById('p-foto-img').style.display = 'none';
+    tempFotoProduct = "";
   }
 
   function renderMasterProduk() {
     const list = document.getElementById('master-produk-list');
-    list.innerHTML = appData.produk.map(p => `
-      <div class="list-row">
-        <div>
-          <b>${p.nama}</b> (${p.kategori})
-          <div style="font-size:10px; color:#666;">Harga: Rp ${p.harga.toLocaleString('id-ID')} | HPP: Rp ${p.hpp.toLocaleString('id-ID')} | Stok: ${p.stok === null ? '∞':p.stok}</div>
-          ${p.isiBatang ? `<div style="font-size:10px; color:#0d9488;">Eceran: Rp ${p.hargaBatang.toLocaleString('id-ID')}/btg | Stok Btg: ${p.stokBatang}</div>`:''}
+    list.innerHTML = appData.produk.map(p => {
+      const imgTag = p.foto ? `<img src="${p.foto}" class="item-img-thumb">` : `<div class="item-img-thumb"></div>`;
+      return `
+        <div class="list-row">
+          <div style="display:flex; align-items:center;">
+            ${imgTag}
+            <div>
+              <b>${p.nama}</b> (${p.kategori})
+              <div style="font-size:10px; color:#666;">Harga: Rp ${p.harga.toLocaleString('id-ID')} | HPP: Rp ${p.hpp.toLocaleString('id-ID')} | Stok: ${p.stok === null ? '∞':p.stok}</div>
+              ${p.barcode ? `<div style="font-size:9px; color:#94a3b8;">BC: ${p.barcode}</div>`:''}
+              ${p.isiBatang ? `<div style="font-size:10px; color:#0d9488;">Eceran: Rp ${p.hargaBatang.toLocaleString('id-ID')}/btg | Stok Btg: ${p.stokBatang}</div>`:''}
+            </div>
+          </div>
+          <button class="btn btn-danger" style="padding:4px 8px; font-size:10px;" onclick="hapusProduk(${p.id})">Hapus</button>
         </div>
-        <button class="btn btn-danger" style="padding:4px 8px; font-size:10px;" onclick="hapusProduk(${p.id})">Hapus</button>
-      </div>
-    `).join('');
+      `;
+    }).join('');
   }
 
   function hapusProduk(id) {
@@ -771,14 +961,14 @@
 
   // EXCEL CSV PRODUK
   function downloadTemplateProdukCSV() {
-    const csvStr = "Nama Produk,Kategori,Harga Jual,HPP Modal,Stok,Isi Per Bungkus,Harga Per Batang,Stok Batang\nSample Rokok,Rokok,25000,21000,10,12,2500,0\nSample Minuman,Minuman,5000,3000,,,";
+    const csvStr = "Barcode,Nama Produk,Kategori,Harga Jual,HPP Modal,Stok,Isi Per Bungkus,Harga Per Batang,Stok Batang\n899990800001,Sample Rokok,Rokok,25000,21000,10,12,2500,0\n,Sample Minuman,Minuman,5000,3000,,,";
     downloadBlob(csvStr, "Template_Produk_KasirWarung.csv", "text/csv");
   }
 
   function exportProdukCSV() {
-    let csv = "ID,Nama Produk,Kategori,Harga Jual,HPP Modal,Stok,Isi Per Bungkus,Harga Per Batang,Stok Batang\n";
+    let csv = "ID,Barcode,Nama Produk,Kategori,Harga Jual,HPP Modal,Stok,Isi Per Bungkus,Harga Per Batang,Stok Batang\n";
     appData.produk.forEach(p => {
-      csv += `${p.id},"${p.nama}",${p.kategori},${p.harga},${p.hpp},${p.stok||''},${p.isiBatang||''},${p.hargaBatang||''},${p.stokBatang||0}\n`;
+      csv += `${p.id},"${p.barcode||''}" "${p.nama}",${p.kategori},${p.harga},${p.hpp},${p.stok||''},${p.isiBatang||''},${p.hargaBatang||''},${p.stokBatang||0}\n`;
     });
     downloadBlob(csv, `Master_Produk_${Date.now()}.csv`, "text/csv");
   }
@@ -790,10 +980,11 @@
       for(let i=1; i<lines.length; i++) {
         if(!lines[i].trim()) continue;
         const col = lines[i].split(',');
-        if(col.length >= 4) {
+        if(col.length >= 5) {
           appData.produk.push({
             id: Date.now() + i,
-            nama: col[1].replace(/"/g, ''),
+            barcode: col[0] ? col[0].replace(/"/g, '') : '',
+            nama: col[1] ? col[1].replace(/"/g, '') : 'Produk Import',
             kategori: col[2] || "Semua",
             harga: parseFloat(col[3]) || 0,
             hpp: parseFloat(col[4]) || 0,
@@ -861,7 +1052,7 @@
     alert("Pembayaran cicilan berhasil dicatat!");
   }
 
-  // LAPORAN & EXCEL
+  // LAPORAN
   function renderLaporan() {
     const omzet = appData.transaksi.reduce((sum, t) => sum + t.total, 0);
     const hpp = appData.transaksi.reduce((sum, t) => sum + t.hpp, 0);
@@ -880,7 +1071,7 @@
     downloadBlob(csv, `Laporan_Transaksi_${Date.now()}.csv`, "text/csv");
   }
 
-  // SETTINGS & JSON
+  // SETTINGS & BACKUP JSON
   function initSettingsUI() {
     document.getElementById('cfg-nama').value = appData.config.namaToko;
     document.getElementById('cfg-alamat').value = appData.config.alamat;
