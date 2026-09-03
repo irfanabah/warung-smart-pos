@@ -1247,7 +1247,28 @@ function renderMenuQR() {
 document.addEventListener('DOMContentLoaded', function() {
   setTimeout(renderMenuQR, 1000);
 });
+// PERBAIKAN OTOMATIS TOMBOL ROKOK BATANGAN DI KASIR
+function perbaikiTombolRokok() {
+  if (!window.appData || !window.appData.produk) return;
 
+  window.appData.produk.forEach(p => {
+    // Jika produk punya harga batang/isi batang, paksakan flag isRokok menjadi true
+    if ((p.hargaBatang && Number(p.hargaBatang) > 0) || (p.isiBatang && Number(p.isiBatang) > 0)) {
+      p.isRokok = true;
+    }
+  });
+
+  // Panggil ulang fungsi render kasir bawaan jika ada
+  if (typeof renderKasir === 'function') renderKasir();
+  if (typeof renderKatalog === 'function') renderKatalog();
+}
+
+// Jalankan perbaikan otomatis saat aplikasi dibuka
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(perbaikiTombolRokok, 500);
+  setTimeout(perbaikiTombolRokok, 1500);
+});
+  
     </script>
   </body>
 </html>
