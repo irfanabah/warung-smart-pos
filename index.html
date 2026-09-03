@@ -1251,23 +1251,33 @@ document.addEventListener('DOMContentLoaded', function() {
 function perbaikiTombolRokok() {
   if (!window.appData || !window.appData.produk) return;
 
+  let adaPerubahan = false;
   window.appData.produk.forEach(p => {
-    // Jika produk punya harga batang/isi batang, paksakan flag isRokok menjadi true
-    if ((p.hargaBatang && Number(p.hargaBatang) > 0) || (p.isiBatang && Number(p.isiBatang) > 0)) {
+    const namaLower = (p.nama || '').toLowerCase();
+
+    if (namaLower.includes('s.p') || namaLower.includes('evo') || (p.hargaBatang && Number(p.hargaBatang) > 0)) {
       p.isRokok = true;
+      if (!p.hargaBatang || Number(p.hargaBatang) === 0) p.hargaBatang = 2000;
+      if (!p.isiBatang) p.isiBatang = 16;
+      if (p.stokBatang === undefined || p.stokBatang === null) p.stokBatang = 16;
+      adaPerubahan = true;
     }
   });
 
-  // Panggil ulang fungsi render kasir bawaan jika ada
+  if (adaPerubahan && typeof saveLocal === 'function') {
+    saveLocal();
+  }
+
   if (typeof renderKasir === 'function') renderKasir();
   if (typeof renderKatalog === 'function') renderKatalog();
 }
 
-// Jalankan perbaikan otomatis saat aplikasi dibuka
 document.addEventListener('DOMContentLoaded', function() {
   setTimeout(perbaikiTombolRokok, 500);
   setTimeout(perbaikiTombolRokok, 1500);
 });
+
+  
   
     </script>
   </body>
