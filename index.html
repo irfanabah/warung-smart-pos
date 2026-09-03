@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kasir Warung Super</title>
-  <!-- Library Scan Barcode Kamera bawaan Web -->
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
@@ -45,16 +44,15 @@
     .btn-excel { background: #10b981; color: #fff; }
     .btn-warning { background: #f59e0b; color: #fff; }
     .btn-scan { background: #3b82f6; color: #fff; }
+    .btn-wa { background: #25d366; color: #fff; }
     .btn-sm { padding: 4px 8px; font-size: 11px; border-radius: 4px; }
     .btn-outline-primary { border: 1px solid #0d9488; color: #0d9488; background: #fff; }
     .btn-outline-secondary { border: 1px solid #64748b; color: #64748b; background: #fff; }
 
-    /* Custom Item & Camera Barcode Styling */
     .search-barcode-box { display: flex; gap: 6px; margin-bottom: 10px; }
     .img-preview { width: 50px; height: 50px; border-radius: 6px; object-fit: cover; border: 1px solid #cbd5e1; display: none; }
     .item-img-thumb { width: 36px; height: 36px; border-radius: 4px; object-fit: cover; background: #e2e8f0; margin-right: 8px; flex-shrink: 0; }
 
-    /* Navigation Bar & Lists */
     .filter-scroll { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 10px; }
     .filter-btn { padding: 5px 10px; border-radius: 16px; background: #e2e8f0; font-size: 11px; font-weight: 600; white-space: nowrap; border: none; cursor: pointer; }
     .filter-btn.active { background: #0d9488; color: #fff; }
@@ -71,7 +69,6 @@
     .nav-item.active { color: #0d9488; font-weight: 600; }
     .nav-item.fab .fab-btn { width: 42px; height: 42px; background: #0d9488; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-top: -20px; box-shadow: 0 4px 8px rgba(13,148,136,0.3); }
 
-    /* Modals & Receipts */
     .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 200; padding: 16px; }
     .modal.active { display: flex; }
     .modal-body { background: #fff; width: 100%; max-width: 360px; border-radius: 10px; padding: 16px; max-height: 90vh; overflow-y: auto; }
@@ -80,6 +77,7 @@
     .receipt-row { display: flex; justify-content: space-between; margin-bottom: 3px; }
     .badge-danger { background: #fee2e2; color: #dc2626; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; }
     .badge-success { background: #dcfce7; color: #16a34a; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; }
+    .badge-warning { background: #fef3c7; color: #d97706; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -136,7 +134,7 @@
       </div>
     </div>
 
-    <!-- 2. HALAMAN KASIR (TRANSAKSI + SCAN + ITEM KAMERA) -->
+    <!-- 2. HALAMAN KASIR -->
     <div id="page-kasir" class="page">
       <div class="card">
         <div class="title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>KATALOG & PEMINDAN BARCODE</div>
@@ -204,7 +202,7 @@
       </div>
     </div>
 
-    <!-- 4. KELOLA PRODUK (SCAN BARCODE & FOTO KAMERA) -->
+    <!-- 4. KELOLA PRODUK -->
     <div id="page-produk" class="page">
       <div class="card">
         <div class="title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>KELOLA KATEGORI</div>
@@ -270,7 +268,7 @@
       </div>
     </div>
 
-    <!-- 5. CATATAN KASBON -->
+    <!-- 5. CATATAN KASBON DENGAN PROSESS TAGIH WA & CICILAN -->
     <div id="page-kasbon" class="page">
       <div class="card">
         <div class="title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>DAFTAR KASBON / PIUTANG</div>
@@ -290,7 +288,7 @@
       </div>
     </div>
 
-    <!-- 7. PENGATURAN / SETTING -->
+    <!-- 7. PENGATURAN -->
     <div id="page-setting" class="page">
       <div class="card">
         <div class="title">PROFIL TOKO & STRUK</div>
@@ -312,9 +310,9 @@
       </div>
     </div>
 
-  </div> <!-- End Content -->
+  </div>
 
-  <!-- NAVIGATION BAR DI BAWAH -->
+  <!-- NAVIGATION BAR -->
   <div class="bottom-nav">
     <button class="nav-item active" onclick="switchTab('Beranda')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
@@ -340,7 +338,30 @@
     </button>
   </div>
 
-  <!-- MODAL SCANNER BARCODE KAMERA -->
+  <!-- MODAL INPUT KASBON LENGKAP -->
+  <div id="modal-kasbon-input" class="modal">
+    <div class="modal-body">
+      <div class="title">FORM DETAIL KASBON</div>
+      <div class="input-group">
+        <label>Nama Pelanggan *</label>
+        <input type="text" id="kb-nama" class="input-field" placeholder="Nama Pelanggan">
+      </div>
+      <div class="input-group">
+        <label>No. HP / WhatsApp (Opsional)</label>
+        <input type="text" id="kb-wa" class="input-field" placeholder="08123456789">
+      </div>
+      <div class="input-group">
+        <label>Tanggal Jatuh Tempo (Opsional)</label>
+        <input type="date" id="kb-tempo" class="input-field">
+      </div>
+      <div class="btn-grid" style="margin-top:12px;">
+        <button class="btn btn-secondary" onclick="batalProsesKasbon()">Batal</button>
+        <button class="btn btn-primary" onclick="simpanProsesKasbon()">Simpan & Cetak</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL SCANNER -->
   <div id="modal-scanner" class="modal">
     <div class="modal-body">
       <div class="title">SCAN BARCODE KAMERA</div>
@@ -367,7 +388,7 @@
     </div>
   </div>
 
-  <!-- MODAL STRUK BUKTI TRANSAKSI -->
+  <!-- MODAL STRUK -->
   <div id="modal-struk" class="modal">
     <div class="modal-body">
       <div id="struk-print" class="receipt"></div>
@@ -378,10 +399,9 @@
     </div>
   </div>
 
-</div> <!-- End App Container -->
+</div>
 
 <script>
-  // DATABASE APLIKASI KASIR
   let appData = {
     kategori: ["Semua", "Seblak", "Minuman", "Rokok", "Sembako"],
     produk: [],
@@ -403,8 +423,8 @@
   let tempCustomFoto = "";
   let html5QrcodeScanner = null;
   let scanModeTarget = "kasir";
+  let pendingKasbonTrx = null;
 
-  // INIT APLIKASI
   document.addEventListener('DOMContentLoaded', () => {
     loadLocal();
     perbaikiTombolRokok();
@@ -448,7 +468,6 @@
     if (tabName === 'Setting') loadSettingForm();
   }
 
-  // FORCE-FIX LOGIKA ROKOK ECERAN (S.p, Evo, DLL)
   function perbaikiTombolRokok() {
     if (!appData || !appData.produk) return;
     let adaPerubahan = false;
@@ -458,53 +477,33 @@
       const punyaHargaBtg = p.hargaBatang && Number(p.hargaBatang) > 0;
 
       if (namaLower.includes('s.p') || namaLower.includes('evo') || punyaHargaBtg) {
-        if (!p.isRokok) {
-          p.isRokok = true;
-          adaPerubahan = true;
-        }
-        if (!p.hargaBatang || Number(p.hargaBatang) === 0) {
-          p.hargaBatang = 2000;
-          adaPerubahan = true;
-        }
-        if (!p.isiBatang) {
-          p.isiBatang = 16;
-          adaPerubahan = true;
-        }
-        if (p.stokBatang === undefined || p.stokBatang === null) {
-          p.stokBatang = 16;
-          adaPerubahan = true;
-        }
+        if (!p.isRokok) { p.isRokok = true; adaPerubahan = true; }
+        if (!p.hargaBatang || Number(p.hargaBatang) === 0) { p.hargaBatang = 2000; adaPerubahan = true; }
+        if (!p.isiBatang) { p.isiBatang = 16; adaPerubahan = true; }
+        if (p.stokBatang === undefined || p.stokBatang === null) { p.stokBatang = 16; adaPerubahan = true; }
       }
     });
 
-    if (adaPerubahan) {
-      saveLocal();
-    }
+    if (adaPerubahan) saveLocal();
   }
 
-  // KELOLA KATEGORI
   function renderKategori() {
     const container = document.getElementById('kasir-kategori-filter');
     const chipList = document.getElementById('kat-chip-list');
     const selectKat = document.getElementById('p-kategori');
 
-    container.innerHTML = '';
-    chipList.innerHTML = '';
-    selectKat.innerHTML = '';
+    container.innerHTML = ''; chipList.innerHTML = ''; selectKat.innerHTML = '';
 
     appData.kategori.forEach(kat => {
-      // Filter di Kasir
       const btn = document.createElement('button');
       btn.className = `filter-btn ${activeKatFilter === kat ? 'active' : ''}`;
       btn.innerText = kat;
       btn.onclick = () => { activeKatFilter = kat; renderKategori(); renderKasirProduk(); };
       container.appendChild(btn);
 
-      // Select di Form Produk
       if (kat !== 'Semua') {
         const opt = document.createElement('option');
-        opt.value = kat;
-        opt.innerText = kat;
+        opt.value = kat; opt.innerText = kat;
         selectKat.appendChild(opt);
 
         const chip = document.createElement('span');
@@ -526,7 +525,6 @@
     }
   }
 
-  // KELOLA PRODUK (SIMPAN & RENDER)
   function previewFotoProduk(event) {
     const file = event.target.files[0];
     if (file) {
@@ -559,13 +557,7 @@
     }
 
     const itemData = {
-      barcode,
-      foto: tempFotoProduct,
-      nama,
-      kategori,
-      harga,
-      hpp,
-      stok,
+      barcode, foto: tempFotoProduct, nama, kategori, harga, hpp, stok,
       isRokok: hrgBt && Number(hrgBt) > 0 ? true : false,
       isiBatang: isiBt ? parseInt(isiBt) : null,
       hargaBatang: hrgBt ? parseFloat(hrgBt) : null,
@@ -574,15 +566,10 @@
 
     if (editId) {
       const idx = appData.produk.findIndex(p => p.id === editId);
-      if (idx !== -1) {
-        appData.produk[idx] = { ...appData.produk[idx], ...itemData };
-      }
+      if (idx !== -1) appData.produk[idx] = { ...appData.produk[idx], ...itemData };
       editId = null;
     } else {
-      appData.produk.push({
-        id: Date.now(),
-        ...itemData
-      });
+      appData.produk.push({ id: Date.now(), ...itemData });
     }
 
     saveLocal();
@@ -648,21 +635,17 @@
     if (p.foto) {
       tempFotoProduct = p.foto;
       const img = document.getElementById('p-foto-img');
-      img.src = p.foto;
-      img.style.display = 'block';
+      img.src = p.foto; img.style.display = 'block';
     }
   }
 
   function hapusProduk(id) {
     if (confirm("Yakin ingin menghapus produk ini?")) {
       appData.produk = appData.produk.filter(p => p.id !== id);
-      saveLocal();
-      renderMasterProduk();
-      renderKasirProduk();
+      saveLocal(); renderMasterProduk(); renderKasirProduk();
     }
   }
 
-  // TAMPILAN KATALOG KASIR (TOMBOL ECERAN DIPAKSA MUNCUL JIKA ADA HARGA BATANG)
   function renderKasirProduk() {
     const list = document.getElementById('kasir-produk-list');
     const search = document.getElementById('kasir-search').value.toLowerCase();
@@ -677,20 +660,14 @@
     filtered.forEach(p => {
       const row = document.createElement('div');
       row.className = 'list-row';
-
       const isEceran = Boolean(p.isRokok) || (p.hargaBatang && Number(p.hargaBatang) > 0);
 
-      let actionBtn = '';
-      if (isEceran) {
-        actionBtn = `
-          <div style="display:flex; flex-direction:column; gap:4px;">
-            <button class="btn btn-sm btn-outline-primary" onclick="tambahKeCart(${p.id}, 'bungkus')">+ Bungkus</button>
-            <button class="btn btn-sm btn-outline-secondary" onclick="tambahKeCart(${p.id}, 'batang')">+ Batang (${p.stokBatang || 0})</button>
-          </div>
-        `;
-      } else {
-        actionBtn = `<button class="btn btn-sm btn-primary" onclick="tambahKeCart(${p.id}, 'bungkus')">+ Tambah</button>`;
-      }
+      let actionBtn = isEceran ? `
+        <div style="display:flex; flex-direction:column; gap:4px;">
+          <button class="btn btn-sm btn-outline-primary" onclick="tambahKeCart(${p.id}, 'bungkus')">+ Bungkus</button>
+          <button class="btn btn-sm btn-outline-secondary" onclick="tambahKeCart(${p.id}, 'batang')">+ Batang (${p.stokBatang || 0})</button>
+        </div>
+      ` : `<button class="btn btn-sm btn-primary" onclick="tambahKeCart(${p.id}, 'bungkus')">+ Tambah</button>`;
 
       row.innerHTML = `
         <div style="display:flex; align-items:center;">
@@ -707,14 +684,12 @@
     });
   }
 
-  // KERANJANG TRANSAKSI & PEMBAYARAN
   function tambahKeCart(id, tipe = 'bungkus') {
     const p = appData.produk.find(x => x.id === id);
     if (!p) return;
 
     const cartKey = `${p.id}_${tipe}`;
     const itemInCart = appData.keranjang.find(x => x.cartKey === cartKey);
-
     const isBatang = (tipe === 'batang');
     const hargaJual = isBatang ? p.hargaBatang : p.harga;
     const labelNama = isBatang ? `${p.nama} (Batangan)` : p.nama;
@@ -723,16 +698,11 @@
       itemInCart.qty += 1;
     } else {
       appData.keranjang.push({
-        cartKey,
-        id: p.id,
-        nama: labelNama,
-        harga: hargaJual,
+        cartKey, id: p.id, nama: labelNama, harga: hargaJual,
         hpp: isBatang ? ((p.hpp || 0) / (p.isiBatang || 1)) : (p.hpp || 0),
-        qty: 1,
-        tipe: tipe
+        qty: 1, tipe: tipe
       });
     }
-
     renderCart();
   }
 
@@ -740,19 +710,12 @@
     const hrg = parseFloat(document.getElementById('seblak-harga').value) || 0;
     const cat = document.getElementById('seblak-catatan').value.trim();
 
-    if (hrg <= 0) {
-      alert("Masukkan nominal harga seblak!");
-      return;
-    }
+    if (hrg <= 0) { alert("Masukkan nominal harga seblak!"); return; }
 
     appData.keranjang.push({
-      cartKey: `seblak_${Date.now()}`,
-      id: `seblak_${Date.now()}`,
+      cartKey: `seblak_${Date.now()}`, id: `seblak_${Date.now()}`,
       nama: `Seblak Prasmanan ${cat ? `(${cat})` : ''}`,
-      harga: hrg,
-      hpp: hrg * 0.6,
-      qty: 1,
-      tipe: 'seblak'
+      harga: hrg, hpp: hrg * 0.6, qty: 1, tipe: 'seblak'
     });
 
     document.getElementById('seblak-harga').value = '';
@@ -792,9 +755,7 @@
 
   function ubahQtyCart(index, delta) {
     appData.keranjang[index].qty += delta;
-    if (appData.keranjang[index].qty <= 0) {
-      appData.keranjang.splice(index, 1);
-    }
+    if (appData.keranjang[index].qty <= 0) appData.keranjang.splice(index, 1);
     renderCart();
   }
 
@@ -815,11 +776,7 @@
   function setCash(val) {
     const total = parseFloat(document.getElementById('kasir-total').value) || 0;
     const input = document.getElementById('kasir-bayar');
-    if (val === 'pas') {
-      input.value = total;
-    } else {
-      input.value = val;
-    }
+    input.value = (val === 'pas') ? total : val;
     hitungKembalian();
   }
 
@@ -837,7 +794,7 @@
     }
   }
 
-  // PROSES BAYAR TERMASUK FITUR FITUR UANG KURANG JADI KASBON AUTOMATIS
+  // LOGIKA TRANSAKSI DENGAN MODAL DETAIL KASBON JATUH TEMPO & NO WA
   function prosesBayar() {
     const total = parseFloat(document.getElementById('kasir-total').value) || 0;
     const metode = document.getElementById('kasir-metode').value;
@@ -849,70 +806,87 @@
     }
 
     let sisaKurang = 0;
-    let namaPelanggan = "";
 
     if (metode === 'Tunai' && bayar < total) {
       sisaKurang = total - bayar;
       const mauKasbon = confirm(`Uang pembayaran kurang Rp ${sisaKurang.toLocaleString('id-ID')}.\n\nApakah sisa kekurangan ingin dimasukkan ke Catatan Kasbon?`);
       if (!mauKasbon) return;
-
-      namaPelanggan = prompt("Masukkan Nama Pelanggan Kasbon:");
-      if (!namaPelanggan) {
-        alert("Nama pelanggan wajib diisi untuk mencatat kasbon!");
-        return;
-      }
     } else if (metode === 'Kasbon') {
-      namaPelanggan = prompt("Masukkan Nama Pelanggan Kasbon:");
-      if (!namaPelanggan) {
-        alert("Nama pelanggan wajib diisi untuk transaksi kasbon!");
-        return;
-      }
       sisaKurang = total;
       bayar = 0;
     }
 
-    // Potong Stok
-    appData.keranjang.forEach(item => {
-      const p = appData.produk.find(x => x.id === item.id);
-      if (p) {
-        if (item.tipe === 'batang') {
-          if (p.stokBatang !== undefined) p.stokBatang -= item.qty;
-        } else if (item.tipe === 'bungkus' && p.stok !== null) {
-          p.stok -= item.qty;
-        }
-      }
-    });
-
-    const trx = {
+    pendingKasbonTrx = {
       id: `TRX-${Date.now()}`,
       waktu: new Date().toLocaleString('id-ID'),
       item: [...appData.keranjang],
-      total,
-      metode,
-      bayar: bayar,
+      total, metode, bayar,
       kembali: (metode === 'Tunai' && bayar >= total) ? (bayar - total) : 0,
-      pelanggan: namaPelanggan
+      sisaKurang
     };
 
-    appData.transaksi.push(trx);
-
-    // Otomatis masukkan kasbon jika ada sisa kurang
     if (sisaKurang > 0) {
-      appData.kasbon.push({
-        id: Date.now(),
-        nama: namaPelanggan,
-        total: sisaKurang,
-        status: 'Belum Lunas',
-        waktu: trx.waktu
-      });
+      document.getElementById('modal-kasbon-input').classList.add('active');
+    } else {
+      selesaikanTransaksi(pendingKasbonTrx, "");
+    }
+  }
+
+  function batalProsesKasbon() {
+    document.getElementById('modal-kasbon-input').classList.remove('active');
+    pendingKasbonTrx = null;
+  }
+
+  function simpanProsesKasbon() {
+    const nama = document.getElementById('kb-nama').value.trim();
+    const wa = document.getElementById('kb-wa').value.trim();
+    const tempo = document.getElementById('kb-tempo').value;
+
+    if (!nama) {
+      alert("Nama Pelanggan wajib diisi!");
+      return;
     }
 
+    appData.kasbon.push({
+      id: Date.now(),
+      nama, wa, tempo,
+      total: pendingKasbonTrx.sisaKurang,
+      terbayar: 0,
+      sisa: pendingKasbonTrx.sisaKurang,
+      status: 'Belum Lunas',
+      waktu: pendingKasbonTrx.waktu,
+      detailItem: pendingKasbonTrx.item.map(i => `${i.nama} x${i.qty}`).join(', ')
+    });
+
+    document.getElementById('modal-kasbon-input').classList.remove('active');
+    document.getElementById('kb-nama').value = '';
+    document.getElementById('kb-wa').value = '';
+    document.getElementById('kb-tempo').value = '';
+
+    selesaikanTransaksi(pendingKasbonTrx, nama);
+  }
+
+  function selesaikanTransaksi(trx, pelanggan) {
+    trx.pelanggan = pelanggan;
+
+    // Potong Stok
+    trx.item.forEach(item => {
+      const p = appData.produk.find(x => x.id === item.id);
+      if (p) {
+        if (item.tipe === 'batang' && p.stokBatang !== undefined) p.stokBatang -= item.qty;
+        else if (item.tipe === 'bungkus' && p.stok !== null) p.stok -= item.qty;
+      }
+    });
+
+    appData.transaksi.push(trx);
     cetakStruk(trx);
+
     appData.keranjang = [];
     document.getElementById('kasir-bayar').value = '';
     saveLocal();
     renderCart();
     renderKasirProduk();
+    pendingKasbonTrx = null;
   }
 
   function cetakStruk(trx) {
@@ -942,6 +916,7 @@
       <div class="receipt-row"><b>Total:</b> <b>Rp ${trx.total.toLocaleString('id-ID')}</b></div>
       <div class="receipt-row"><span>Metode:</span> <span>${trx.metode}</span></div>
       <div class="receipt-row"><span>Bayar:</span> <span>Rp ${trx.bayar.toLocaleString('id-ID')}</span></div>
+      ${trx.sisaKurang > 0 ? `<div class="receipt-row" style="color:#dc2626;"><b>Sisa Kasbon:</b> <b>Rp ${trx.sisaKurang.toLocaleString('id-ID')}</b></div>` : ''}
       <div class="receipt-row"><span>Kembali:</span> <span>Rp ${trx.kembali.toLocaleString('id-ID')}</span></div>
       <hr style="margin:4px 0; border:none; border-top:1px dashed #000;">
       <center><small>${appData.setting.footer}</small></center>
@@ -954,11 +929,91 @@
     document.getElementById('modal-struk').classList.remove('active');
   }
 
-  // MODAL CUSTOM FOTO ITEM
-  function bukaModalFotoCustomItem() {
-    document.getElementById('modal-foto-custom').classList.add('active');
+  // PENGELOLAAN KASBON LENGKAP: FITUR CICILAN & TAGIH VIA WHATSAPP
+  function renderKasbon() {
+    const list = document.getElementById('kasbon-list');
+    list.innerHTML = '';
+
+    appData.kasbon.forEach((k, idx) => {
+      const row = document.createElement('div');
+      row.className = 'list-row';
+      
+      const sisaHutang = k.sisa !== undefined ? k.sisa : k.total;
+      let badgeClass = k.status === 'Lunas' ? 'badge-success' : (k.terbayar > 0 ? 'badge-warning' : 'badge-danger');
+      let statusLabel = k.status === 'Lunas' ? 'Lunas' : (k.terbayar > 0 ? 'Dicicil' : 'Belum Lunas');
+
+      row.innerHTML = `
+        <div style="flex:1;">
+          <b>${k.nama}</b> <span class="${badgeClass}">${statusLabel}</span>
+          ${k.wa ? `<small style="display:block; color:#0d9488;">WA: ${k.wa}</small>` : ''}
+          <div>Sisa Kasbon: <b>Rp ${sisaHutang.toLocaleString('id-ID')}</b> <small>(Total: Rp ${k.total.toLocaleString('id-ID')})</small></div>
+          ${k.tempo ? `<small style="color:#d97706;">Jatuh Tempo: ${k.tempo}</small><br>` : ''}
+          <small style="color:#64748b;">${k.waktu}</small>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:4px; align-items:flex-end;">
+          ${k.status !== 'Lunas' ? `
+            <button class="btn btn-sm btn-primary" onclick="bayarKasbon(${idx})">Bayar / Cicil</button>
+            ${k.wa ? `<button class="btn btn-sm btn-wa" onclick="tagihWA(${idx})">Tagih WA</button>` : ''}
+          ` : ''}
+          <button class="btn btn-sm btn-danger" onclick="hapusKasbon(${idx})">Hapus</button>
+        </div>
+      `;
+      list.appendChild(row);
+    });
   }
 
+  function bayarKasbon(index) {
+    const k = appData.kasbon[index];
+    const sisa = k.sisa !== undefined ? k.sisa : k.total;
+    const nominal = prompt(`Sisa kasbon ${k.nama} saat ini: Rp ${sisa.toLocaleString('id-ID')}\n\nMasukkan nominal pembayaran/cicilan:`, sisa);
+
+    if (nominal !== null) {
+      const bayar = parseFloat(nominal) || 0;
+      if (bayar <= 0) return;
+
+      k.terbayar = (k.terbayar || 0) + bayar;
+      k.sisa = k.total - k.terbayar;
+
+      if (k.sisa <= 0) {
+        k.sisa = 0;
+        k.status = 'Lunas';
+        alert(`Kasbon ${k.nama} telah LUNAS!`);
+      } else {
+        k.status = 'Belum Lunas';
+        alert(`Pembayaran dicatat. Sisa kasbon ${k.nama}: Rp ${k.sisa.toLocaleString('id-ID')}`);
+      }
+
+      saveLocal();
+      renderKasbon();
+    }
+  }
+
+  function tagihWA(index) {
+    const k = appData.kasbon[index];
+    let num = k.wa.replace(/[^0-9]/g, '');
+    if (num.startsWith('0')) num = '62' + num.slice(1);
+
+    const sisa = k.sisa !== undefined ? k.sisa : k.total;
+    const pesan = `Halo kak ${k.nama}, sekadar mengingatkan catatan kasbon di ${appData.setting.nama}:\n\n` +
+                  `*Total Kasbon:* Rp ${k.total.toLocaleString('id-ID')}\n` +
+                  `*Sudah Dibayar:* Rp ${(k.terbayar || 0).toLocaleString('id-ID')}\n` +
+                  `*Sisa Tagihan:* Rp ${sisa.toLocaleString('id-ID')}\n` +
+                  (k.tempo ? `*Jatuh Tempo:* ${k.tempo}\n` : '') +
+                  `\nMohon untuk segera dilunasi ya. Terima kasih!`;
+
+    window.open(`https://wa.me/${num}?text=${encodeURIComponent(pesan)}`, '_blank');
+  }
+
+  function hapusKasbon(index) {
+    if (confirm("Hapus catatan kasbon ini?")) {
+      appData.kasbon.splice(index, 1);
+      saveLocal();
+      renderKasbon();
+    }
+  }
+
+  // MODAL CUSTOM FOTO ITEM
+  function bukaModalFotoCustomItem() { document.getElementById('modal-foto-custom').classList.add('active'); }
   function tutupModalFotoCustomItem() {
     document.getElementById('modal-foto-custom').classList.remove('active');
     document.getElementById('custom-nama').value = '';
@@ -966,7 +1021,6 @@
     document.getElementById('custom-foto-preview').style.display = 'none';
     tempCustomFoto = "";
   }
-
   function previewCustomFoto(event) {
     const file = event.target.files[0];
     if (file) {
@@ -980,26 +1034,15 @@
       reader.readAsDataURL(file);
     }
   }
-
   function simpanCustomFotoKeCart() {
     const nama = document.getElementById('custom-nama').value.trim() || 'Barang Foto Cepat';
     const harga = parseFloat(document.getElementById('custom-harga').value) || 0;
-
-    if (harga <= 0) {
-      alert("Masukkan harga jual!");
-      return;
-    }
+    if (harga <= 0) { alert("Masukkan harga jual!"); return; }
 
     appData.keranjang.push({
-      cartKey: `custom_${Date.now()}`,
-      id: `custom_${Date.now()}`,
-      nama: nama,
-      harga: harga,
-      hpp: harga * 0.7,
-      qty: 1,
-      tipe: 'custom'
+      cartKey: `custom_${Date.now()}`, id: `custom_${Date.now()}`,
+      nama: nama, harga: harga, hpp: harga * 0.7, qty: 1, tipe: 'custom'
     });
-
     tutupModalFotoCustomItem();
     renderCart();
   }
@@ -1008,17 +1051,12 @@
   function bukaModalScanner(target) {
     scanModeTarget = target;
     document.getElementById('modal-scanner').classList.add('active');
-
     html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
     html5QrcodeScanner.render(onScanSuccess);
   }
-
   function onScanSuccess(decodedText) {
-    if (html5QrcodeScanner) {
-      html5QrcodeScanner.clear();
-    }
+    if (html5QrcodeScanner) html5QrcodeScanner.clear();
     document.getElementById('modal-scanner').classList.remove('active');
-
     if (scanModeTarget === 'kasir') {
       document.getElementById('kasir-search').value = decodedText;
       renderKasirProduk();
@@ -1026,39 +1064,9 @@
       document.getElementById('p-barcode').value = decodedText;
     }
   }
-
   function tutupModalScanner() {
-    if (html5QrcodeScanner) {
-      html5QrcodeScanner.clear();
-    }
+    if (html5QrcodeScanner) html5QrcodeScanner.clear();
     document.getElementById('modal-scanner').classList.remove('active');
-  }
-
-  // KASBON
-  function renderKasbon() {
-    const list = document.getElementById('kasbon-list');
-    list.innerHTML = '';
-
-    appData.kasbon.forEach((k, idx) => {
-      const row = document.createElement('div');
-      row.className = 'list-row';
-      row.innerHTML = `
-        <div>
-          <b>${k.nama}</b> <span class="${k.status === 'Lunas' ? 'badge-success' : 'badge-danger'}">${k.status}</span>
-          <div>Total: Rp ${k.total.toLocaleString('id-ID')} | <small>${k.waktu}</small></div>
-        </div>
-        ${k.status === 'Belum Lunas' ? `<button class="btn btn-sm btn-primary" onclick="pelunasanKasbon(${idx})">Pelunasan</button>` : ''}
-      `;
-      list.appendChild(row);
-    });
-  }
-
-  function pelunasanKasbon(index) {
-    if (confirm("Tandai kasbon ini sebagai Lunas?")) {
-      appData.kasbon[index].status = 'Lunas';
-      saveLocal();
-      renderKasbon();
-    }
   }
 
   // DASHBOARD & LAPORAN
@@ -1066,28 +1074,21 @@
     const today = new Date().toLocaleDateString('id-ID');
     const trxToday = appData.transaksi.filter(t => t.waktu.includes(today));
 
-    let totalOmzet = 0;
-    let totalHPP = 0;
-
+    let totalOmzet = 0; let totalHPP = 0;
     appData.transaksi.forEach(t => {
       totalOmzet += t.total;
-      t.item.forEach(i => {
-        totalHPP += (i.hpp || 0) * i.qty;
-      });
+      t.item.forEach(i => { totalHPP += (i.hpp || 0) * i.qty; });
     });
 
     document.getElementById('dash-omzet').innerText = `Rp ${trxToday.reduce((a, b) => a + b.total, 0).toLocaleString('id-ID')}`;
     document.getElementById('dash-transaksi').innerText = trxToday.length;
-
     document.getElementById('lap-omzet').innerText = `Rp ${totalOmzet.toLocaleString('id-ID')}`;
     document.getElementById('lap-hpp').innerText = `Rp ${totalHPP.toLocaleString('id-ID')}`;
     document.getElementById('lap-laba').innerText = `Rp ${(totalOmzet - totalHPP).toLocaleString('id-ID')}`;
 
-    // Warning Stok
     const minStok = appData.setting.minStok || 5;
     const lowStock = appData.produk.filter(p => p.stok !== null && p.stok <= minStok);
     const warnDiv = document.getElementById('dash-stok-warning');
-
     if (lowStock.length > 0) {
       warnDiv.innerHTML = lowStock.map(p => `<div style="color:#ef4444;">⚠️ <b>${p.nama}</b> sisa ${p.stok}</div>`).join('');
     } else {
@@ -1110,7 +1111,6 @@
     appData.setting.wa = document.getElementById('cfg-wa').value;
     appData.setting.footer = document.getElementById('cfg-footer').value;
     appData.setting.minStok = parseInt(document.getElementById('cfg-minstok').value) || 5;
-
     saveLocal();
     alert("Pengaturan berhasil disimpan!");
   }
@@ -1140,9 +1140,7 @@
           appData = JSON.parse(e.target.result);
           saveLocal();
           location.reload();
-        } catch (err) {
-          alert("File JSON tidak valid!");
-        }
+        } catch (err) { alert("File JSON tidak valid!"); }
       };
       reader.readAsText(file);
     }
