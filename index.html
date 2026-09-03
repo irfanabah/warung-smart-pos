@@ -913,25 +913,25 @@
     const index = appData.produk.findIndex(p => p.id == editId);
     if (index !== -1) {
       appData.produk[index] = {
-        ...appData.produk[index],
-        barcode, nama, kategori, harga, hpp, stok,
+  barcode, nama, kategori, harga, hpp, stok,
+  isRokok: hrgBt ? true : false,
+  isiBatang: isiBt ? parseInt(isiBt) : null,
+  hargaBatang: hrgBt ? parseFloat(hrgBt) : null,
+  stokBatang: stokBt ? parseInt(stokBt) : 0
+};
+    }
+    editId = null; // Reset kembali
+      } else {
+      // Jika mode Tambah Baru
+      appData.produk.push({
+        id: Date.now(),
+        barcode, foto: tempFotoProduct, nama, kategori, harga, hpp, stok,
+        isRokok: hrgBt ? true : false,
         isiBatang: isiBt ? parseInt(isiBt) : null,
         hargaBatang: hrgBt ? parseFloat(hrgBt) : null,
         stokBatang: stokBt ? parseInt(stokBt) : 0
-      };
+      });
     }
-    editId = null; // Reset kembali
-  } else {
-    // Jika mode Tambah Baru
-    appData.produk.push({
-      id: Date.now(),
-      barcode, foto: tempFotoProduct, nama, kategori, harga, hpp, stok,
-      isiBatang: isiBt ? parseInt(isiBt) : null,
-      hargaBatang: hrgBt ? parseFloat(hrgBt) : null,
-      stokBatang: stokBt ? parseInt(stokBt) : 0
-    });
-  }
-
   saveLocal(); 
   renderMasterProduk();
   alert(editId ? "Produk berhasil diperbarui!" : "Produk berhasil disimpan!");
