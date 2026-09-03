@@ -35,13 +35,17 @@
     <p style="text-align: center; font-size: 12px; color: #64748b;">Memuat daftar menu...</p>
   </div>
 
-  <div class="bottom-bar">
+  <div class="bottom-bar" style="display: flex; flex-direction: column; gap: 8px;">
+  <input type="text" id="nama-pemesan" placeholder="Masukkan Nama Kamu..." style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px; font-size: 13px;">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
     <div>
-      <span style="font-size: 11px; color: #64748b;">Total Pesanan:</span>
+      <span style="font-size: 11px; color: #64748b;">Total</span>
       <div id="total-harga" style="font-weight: bold; color: #0d9488;">Rp 0</div>
     </div>
     <button class="btn-order" onclick="kirimPesanan()">Kirim Pesanan</button>
   </div>
+</div>
+
 
   <script>
     // 1. ISI DENGAN URL & ANON KEY SUPABASE KAMU
@@ -106,24 +110,44 @@
 
     // 4. Kirim Pesanan ke Tabel 'orders' di Supabase
     async function kirimPesanan() {
-      if(cart.length === 0) {
-        alert("Pilih minimal 1 menu makanan/minuman!");
-        return;
+  const namaInput = document.getElementById('nama-pemesan').value.trim();
+
+  // 1. Cek apakah pembeli sudah mengisi nama
+  if (!namaInput) {
+    alert("Harap masukkan nama kamu terlebih dahulu!");
+    return;
+  }
+
+  // 2. Cek apakah keranjang belanja ada isinya
+  if (cart.length === 0) {
+    alert("Pilih minimal 1 menu makanan/minuman!");
+    return;
+  }
+
+  const total = cart.reduce((sum, item) => sum + (item.harga * item.qty), 0);
+
+  // 3. Kirim data pesanan ke Supabase
+  const { data, error } = await supabase
+    .from('orders')
+    .insert([
+      {
+        table_number: nomorMeja || 0,
+        customer_name: namaInput,
+        items: cart,
+        total_amount: total,
+        status: 'pending',
+        payment_status: 'unpaid'
       }
+    ]);
 
-      const total = cart.reduce((sum, item) => sum + (item.harga * item.qty), 0);
+  if (error) {
+    alert("Gagal mengirim pesanan: " + error.message);
+  } else {
+    alert(`Terima kasih ${namaInput}, pesanan kamu berhasil dikirim!`);
+    location.reload();
+  }
+}
 
-      const { data, error } = await supabase
-        .from('orders')
-        .insert([
-          {
-            table_number: nomorMeja,
-            items: cart,
-            total_amount: total,
-            status: 'pending',
-            payment_status: 'unpaid'
-          }
-        ]);
 
       if(error) {
         alert("Gagal mengirim pesanan. Coba lagi.");
