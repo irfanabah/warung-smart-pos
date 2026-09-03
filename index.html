@@ -894,44 +894,60 @@
 
   // MASTER PRODUK
   function simpanProduk() {
-    const barcode = document.getElementById('p-barcode').value.trim();
-    const nama = document.getElementById('p-nama').value.trim();
-    const kategori = document.getElementById('p-kategori').value;
-    const harga = parseFloat(document.getElementById('p-harga').value) || 0;
-    const hpp = parseFloat(document.getElementById('p-hpp').value) || (harga * (appData.config.defHppPct / 100));
-    const stokRaw = document.getElementById('p-stok').value;
-    const stok = stokRaw === "" ? null : parseInt(stokRaw);
+  const barcode = document.getElementById('p-barcode').value;
+  const nama = document.getElementById('p-nama').value;
+  const kategori = document.getElementById('p-kategori').value;
+  const harga = parseFloat(document.getElementById('p-harga').value) || 0;
+  const hpp = parseFloat(document.getElementById('p-hpp').value) || 0;
+  const stokRaw = document.getElementById('p-stok').value;
+  const stok = stokRaw === "" ? null : parseInt(stokRaw);
 
-    const isiBt = document.getElementById('p-isi-btg').value;
-    const hrgBt = document.getElementById('p-hrg-btg').value;
-    const stokBt = document.getElementById('p-stok-btg').value;
+  const isiBt = document.getElementById('p-isi-bt')?.value;
+  const hrgBt = document.getElementById('p-hrg-bt')?.value;
+  const stokBt = document.getElementById('p-stok-bt')?.value;
 
-    if(!nama || harga <= 0) { alert("Nama dan harga produk wajib diisi!"); return; }
+  if (!nama || harga <= 0) { alert("Nama dan harga harus diisi!"); return; }
 
+  if (editId) {
+    // Jika sedang mode Edit
+    const index = appData.produk.findIndex(p => p.id == editId);
+    if (index !== -1) {
+      appData.produk[index] = {
+        ...appData.produk[index],
+        barcode, nama, kategori, harga, hpp, stok,
+        isiBatang: isiBt ? parseInt(isiBt) : null,
+        hargaBatang: hrgBt ? parseFloat(hrgBt) : null,
+        stokBatang: stokBt ? parseInt(stokBt) : 0
+      };
+    }
+    editId = null; // Reset kembali
+  } else {
+    // Jika mode Tambah Baru
     appData.produk.push({
       id: Date.now(),
-      barcode: barcode,
-      foto: tempFotoProduct,
-      nama: nama,
-      kategori: kategori,
-      harga: harga,
-      hpp: hpp,
-      stok: stok,
+      barcode, foto: tempFotoProduct, nama, kategori, harga, hpp, stok,
       isiBatang: isiBt ? parseInt(isiBt) : null,
       hargaBatang: hrgBt ? parseFloat(hrgBt) : null,
       stokBatang: stokBt ? parseInt(stokBt) : 0
     });
-
-    saveLocal(); renderMasterProduk();
-    alert("Produk berhasil disimpan!");
-    document.getElementById('p-barcode').value = '';
-    document.getElementById('p-nama').value = '';
-    document.getElementById('p-harga').value = '';
-    document.getElementById('p-hpp').value = '';
-    document.getElementById('p-stok').value = '';
-    document.getElementById('p-foto-img').style.display = 'none';
-    tempFotoProduct = "";
   }
+
+  saveLocal(); 
+  renderMasterProduk();
+  alert(editId ? "Produk berhasil diperbarui!" : "Produk berhasil disimpan!");
+
+  // Reset Form
+  document.getElementById('p-barcode').value = '';
+  document.getElementById('p-nama').value = '';
+  document.getElementById('p-harga').value = '';
+  document.getElementById('p-hpp').value = '';
+  document.getElementById('p-stok').value = '';
+  if (document.getElementById('p-isi-bt')) document.getElementById('p-isi-bt').value = '';
+  if (document.getElementById('p-hrg-bt')) document.getElementById('p-hrg-bt').value = '';
+  if (document.getElementById('p-stok-bt')) document.getElementById('p-stok-bt').value = '';
+  tempFotoProduct = "";
+}
+
 
   function renderMasterProduk() {
     const list = document.getElementById('master-produk-list');
@@ -948,6 +964,7 @@
               ${p.isiBatang ? `<div style="font-size:10px; color:#0d9488;">Eceran: Rp ${p.hargaBatang.toLocaleString('id-ID')}/btg | Stok Btg: ${p.stokBatang}</div>`:''}
             </div>
           </div>
+          <button class="btn" onclick="editProduk('${p.id}')" style="padding:4px 8px; background-color:#0284c7; color:white; border:none; border-radius:4px; margin-right:4px; font-weight:bold;">Edit</button>
           <button class="btn btn-danger" style="padding:4px 8px; font-size:10px;" onclick="hapusProduk(${p.id})">Hapus</button>
         </div>
       `;
@@ -955,9 +972,31 @@
   }
 
   function hapusProduk(id) {
-    appData.produk = appData.produk.filter(p => p.id !== id);
-    saveLocal(); renderMasterProduk();
-  }
+  appData.produk = appData.produk.filter(p => p.id !== id);
+  saveLocal();
+  renderMasterProduk();
+}
+let editId = null;
+
+function editProduk(id) {
+  const p = appData.produk.find(item => item.id == id);
+  if (!p) return;
+
+  editId = id;
+
+  document.getElementById('p-barcode').value = p.barcode || '';
+  document.getElementById('p-nama').value = p.nama || '';
+  document.getElementById('p-kategori').value = p.kategori || '';
+  document.getElementById('p-harga').value = p.harga || '';
+  document.getElementById('p-hpp').value = p.hpp || '';
+  document.getElementById('p-stok').value = p.stok !== null ? p.stok : '';
+
+  if (document.getElementById('p-isi-bt')) document.getElementById('p-isi-bt').value = p.isiBatang || '';
+  if (document.getElementById('p-hrg-bt')) document.getElementById('p-hrg-bt').value = p.hargaBatang || '';
+  if (document.getElementById('p-stok-bt')) document.getElementById('p-stok-bt').value = p.stokBatang || '';
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
   // EXCEL CSV PRODUK
   function downloadTemplateProdukCSV() {
