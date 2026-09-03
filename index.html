@@ -45,6 +45,9 @@
     .btn-excel { background: #10b981; color: #fff; }
     .btn-warning { background: #f59e0b; color: #fff; }
     .btn-scan { background: #3b82f6; color: #fff; }
+    .btn-sm { padding: 4px 8px; font-size: 11px; border-radius: 4px; }
+    .btn-outline-primary { border: 1px solid #0d9488; color: #0d9488; background: #fff; }
+    .btn-outline-secondary { border: 1px solid #64748b; color: #64748b; background: #fff; }
 
     /* Custom Item & Camera Barcode Styling */
     .search-barcode-box { display: flex; gap: 6px; margin-bottom: 10px; }
@@ -138,7 +141,6 @@
       <div class="card">
         <div class="title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>KATALOG & PEMINDAN BARCODE</div>
         
-        <!-- BAR PENCARIAN & TOMBOL SCAN -->
         <div class="search-barcode-box">
           <input type="text" id="kasir-search" class="input-field" placeholder="Ketik nama atau kode barcode..." oninput="renderKasirProduk()">
           <button class="btn btn-scan" onclick="bukaModalScanner('kasir')" style="white-space:nowrap;">📷 Scan</button>
@@ -301,277 +303,236 @@
       <div class="card">
         <div class="title">OPERASIONAL & PEMBAYARAN</div>
         <div class="input-group"><label>Batas Peringatan Stok Menipis</label><input type="number" id="cfg-minstok" class="input-field"></div>
-        <div class="input-group"><label>Default Persentase HPP Modal (%)</label><input type="number" id="cfg-defhpp" class="input-field"></div>
-        <div class="input-group">
-          <label>Metode Pembayaran Custom (Pisahkan Koma)</label>
-          <input type="text" id="cfg-metode" class="input-field" placeholder="Tunai, QRIS, Transfer BCA">
-        </div>
-        <button class="btn btn-primary" style="width:100%" onclick="simpanPengaturan()">Simpan Pengaturan</button>
+        <button class="btn btn-primary" style="width:100%; margin-top:8px;" onclick="simpanSetting()">Simpan Pengaturan</button>
       </div>
 
       <div class="card">
-        <div class="title" style="color:#ef4444;">RESET DATA</div>
-        <div class="btn-grid">
-          <button class="btn btn-warning" onclick="resetTransaksi()">Reset Transaksi</button>
-          <button class="btn btn-danger" onclick="resetTotalAplikasi()">Reset Total Aplikasi</button>
-        </div>
+        <div class="title" style="color:#ef4444;">RESET & HAPUS DATA</div>
+        <button class="btn btn-danger" style="width:100%" onclick="resetDataAplikasi()">Reset Semua Data Aplikasi</button>
       </div>
     </div>
 
+  </div> <!-- End Content -->
+
+  <!-- NAVIGATION BAR DI BAWAH -->
+  <div class="bottom-nav">
+    <button class="nav-item active" onclick="switchTab('Beranda')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+      Beranda
+    </button>
+    <button class="nav-item" onclick="switchTab('Produk')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+      Produk
+    </button>
+    <button class="nav-item fab" onclick="switchTab('Kasir')">
+      <div class="fab-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:22px; height:22px;"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      </div>
+      Kasir
+    </button>
+    <button class="nav-item" onclick="switchTab('Kasbon')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      Kasbon
+    </button>
+    <button class="nav-item" onclick="switchTab('Setting')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Setting
+    </button>
   </div>
 
-  <!-- NAVIGATION BAR -->
-  <nav class="bottom-nav">
-    <button class="nav-item active" onclick="switchTab('Beranda')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Beranda</span></button>
-    <button class="nav-item" onclick="switchTab('Produk')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg><span>Produk</span></button>
-    <button class="nav-item fab" onclick="switchTab('Kasir')"><div class="fab-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/></svg></div><span>Kasir</span></button>
-    <button class="nav-item" onclick="switchTab('Kasbon')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg><span>Kasbon</span></button>
-    <button class="nav-item" onclick="switchTab('Setting')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>Setting</span></button>
-  </nav>
-</div>
-
-<!-- MODAL SCANNER BARCODE KAMERA -->
-<div class="modal" id="modalScanner">
-  <div class="modal-body" style="text-align:center;">
-    <div class="title" style="justify-content:center;">PEMINDAN BARCODE KAMERA</div>
-    <div id="reader" style="width:100%; max-width:300px; margin:0 auto 10px auto;"></div>
-    <button class="btn btn-danger" style="width:100%" onclick="tutupModalScanner()">Tutup Scanner</button>
+  <!-- MODAL SCANNER BARCODE KAMERA -->
+  <div id="modal-scanner" class="modal">
+    <div class="modal-body">
+      <div class="title">SCAN BARCODE KAMERA</div>
+      <div id="reader" style="width:100%; min-height:220px; background:#000; border-radius:8px; overflow:hidden;"></div>
+      <button class="btn btn-secondary" style="width:100%; margin-top:12px;" onclick="tutupModalScanner()">Tutup Scanner</button>
+    </div>
   </div>
-</div>
 
-<!-- MODAL FOTO BARANG CUSTOM (TANPA BARCODE) -->
-<div class="modal" id="modalFotoCustomItem">
-  <div class="modal-body">
-    <div class="title">TRANSAKSI CEPT BARANG CUSTOM</div>
-    <div class="input-group">
-      <label>Foto Barang (Opsional)</label>
+  <!-- MODAL FOTO CUSTOM ITEM -->
+  <div id="modal-foto-custom" class="modal">
+    <div class="modal-body">
+      <div class="title">TAMBAH ITEM CEPAT DARI KAMERA</div>
       <input type="file" id="custom-foto-input" accept="image/*" capture="environment" style="display:none" onchange="previewCustomFoto(event)">
-      <div style="display:flex; gap:8px; align-items:center;">
-        <button class="btn btn-secondary" onclick="document.getElementById('custom-foto-input').click()">📷 Ambil Foto Barang</button>
-        <img id="custom-foto-img" class="img-preview" src="" alt="Preview">
+      <button class="btn btn-secondary" style="width:100%; margin-bottom:10px;" onclick="document.getElementById('custom-foto-input').click()">📷 Ambil Foto Barang</button>
+      <center><img id="custom-foto-preview" class="img-preview" src="" style="width:100px; height:100px; margin-bottom:10px;"></center>
+      
+      <div class="input-group"><label>Nama Barang</label><input type="text" id="custom-nama" class="input-field" placeholder="Misal: Es Teh Manis"></div>
+      <div class="input-group"><label>Harga Jual (Rp)</label><input type="number" id="custom-harga" class="input-field" placeholder="3000"></div>
+      
+      <div class="btn-grid" style="margin-top:12px;">
+        <button class="btn btn-secondary" onclick="tutupModalFotoCustomItem()">Batal</button>
+        <button class="btn btn-primary" onclick="simpanCustomFotoKeCart()">Masuk Keranjang</button>
       </div>
     </div>
-    <div class="input-group"><label>Nama Barang Custom</label><input type="text" id="custom-nama" class="input-field" placeholder="Misal: Kerupuk Kaleng A"></div>
-    <div class="input-group"><label>Harga Jual (Rp)</label><input type="number" id="custom-harga" class="input-field" placeholder="Nominal harga"></div>
-    <div class="btn-grid">
-      <button class="btn btn-secondary" onclick="document.getElementById('modalFotoCustomItem').classList.remove('active')">Batal</button>
-      <button class="btn btn-primary" onclick="tambahCustomItemKeCart()">Masuk Keranjang</button>
-    </div>
   </div>
-</div>
 
-<!-- MODAL STRUK -->
-<div class="modal" id="modalStruk">
-  <div class="modal-body">
-    <div class="receipt">
-      <div class="receipt-header">
-        <b id="st-nama" style="font-size:13px;">WARUNG BISMILLAH</b>
-        <div id="st-alamat">Bogor</div>
-        <div id="st-wa">WA: -</div>
+  <!-- MODAL STRUK BUKTI TRANSAKSI -->
+  <div id="modal-struk" class="modal">
+    <div class="modal-body">
+      <div id="struk-print" class="receipt"></div>
+      <div class="btn-grid" style="margin-top:14px;">
+        <button class="btn btn-secondary" onclick="tutupModalStruk()">Tutup</button>
+        <button class="btn btn-primary" onclick="window.print()">Cetak Struk</button>
       </div>
-      <div id="st-items"></div>
-      <hr style="border:none; border-top:1px dashed #000; margin:6px 0;">
-      <div class="receipt-row"><span>Total:</span><b id="st-total">Rp 0</b></div>
-      <div class="receipt-row"><span>Metode:</span><span id="st-metode">Tunai</span></div>
-      <div class="receipt-row"><span>Bayar:</span><span id="st-bayar">Rp 0</span></div>
-      <div class="receipt-row"><span>Kembali:</span><span id="st-kembali">Rp 0</span></div>
-      <div style="text-align:center; margin-top:10px; border-top:1px dashed #000; padding-top:6px;" id="st-footer">Terima Kasih!</div>
     </div>
-    <button class="btn btn-primary" style="width:100%; margin-top:12px;" onclick="tutupStruk()">Tutup Struk</button>
   </div>
-</div>
 
-<!-- MODAL KASBON DIRECT -->
-<div class="modal" id="modalKasbonDirect">
-  <div class="modal-body">
-    <div class="title">JADIKAN TRANSAKSI KASBON</div>
-    <div class="input-group"><label>Nama Pelanggan</label><input type="text" id="kd-nama" class="input-field"></div>
-    <div class="input-group"><label>Tanggal Jatuh Tempo</label><input type="date" id="kd-tempo" class="input-field"></div>
-    <div class="btn-grid">
-      <button class="btn btn-secondary" onclick="document.getElementById('modalKasbonDirect').classList.remove('active')">Batal</button>
-      <button class="btn btn-primary" onclick="simpanKasbonDirect()">Simpan Kasbon</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL CICIL KASBON -->
-<div class="modal" id="modalCicil">
-  <div class="modal-body">
-    <div class="title">BAYAR / CICIL KASBON</div>
-    <div style="font-size:12px; margin-bottom:8px;">Pelanggan: <b id="mc-nama">-</b></div>
-    <div style="font-size:12px; margin-bottom:8px;">Sisa Utang: <b id="mc-sisa" style="color:#ef4444;">Rp 0</b></div>
-    <div class="input-group"><label>Nominal Bayar / Cicil (Rp)</label><input type="number" id="mc-nominal" class="input-field"></div>
-    <div class="btn-grid">
-      <button class="btn btn-secondary" onclick="document.getElementById('modalCicil').classList.remove('active')">Batal</button>
-      <button class="btn btn-primary" onclick="prosesCicil()">Simpan Pembayaran</button>
-    </div>
-  </div>
-</div>
+</div> <!-- End App Container -->
 
 <script>
+  // DATABASE APLIKASI KASIR
   let appData = {
-    config: {
-      namaToko: "WARUNG BISMILLAH",
-      alamat: "Bogor",
-      wa: "081234567890",
-      footer: "Terima Kasih Atas Kunjungannya!",
-      minStok: 5,
-      defHppPct: 60,
-      metodeBayar: ["Tunai", "QRIS", "Transfer BCA"]
-    },
     kategori: ["Semua", "Seblak", "Minuman", "Rokok", "Sembako"],
-    produk: [
-      { id: 1, barcode: "899990800001", foto: "", nama: "Filter Garam 12", kategori: "Rokok", harga: 24000, hpp: 21000, stok: 10, isiBatang: 12, hargaBatang: 2200, stokBatang: 5 },
-      { id: 2, barcode: "899100110022", foto: "", nama: "Es Teh Manis", kategori: "Minuman", harga: 5000, hpp: 2500, stok: null }
-    ],
-    cart: [],
+    produk: [],
+    keranjang: [],
     transaksi: [],
-    kasbon: []
+    kasbon: [],
+    setting: {
+      nama: "Warung Smart POS",
+      alamat: "Jl. Raya Cisarua Bogor",
+      wa: "08123456789",
+      footer: "Terima kasih telah berbelanja!",
+      minStok: 5
+    }
   };
 
-  let activeKasirKategori = "Semua";
-  let activeCicilId = null;
-  let html5QrcodeScanner = null;
-  let scanTarget = "kasir"; 
+  let editId = null;
+  let activeKatFilter = "Semua";
   let tempFotoProduct = "";
-  let tempFotoCustom = "";
+  let tempCustomFoto = "";
+  let html5QrcodeScanner = null;
+  let scanModeTarget = "kasir";
 
-  window.onload = function() {
+  // INIT APLIKASI
+  document.addEventListener('DOMContentLoaded', () => {
     loadLocal();
-    initSettingsUI();
-    updateBeranda();
-    renderKategoriUI();
+    perbaikiTombolRokok();
+    renderKategori();
     renderKasirProduk();
+    renderMasterProduk();
+    renderKasbon();
+    renderDashboard();
     renderKasirPayUI();
-  };
+  });
 
   function saveLocal() {
-    localStorage.setItem("KASIR_WARUNG_DATA", JSON.stringify(appData));
+    localStorage.setItem('warung_pos_data', JSON.stringify(appData));
   }
 
   function loadLocal() {
-    const data = localStorage.getItem("KASIR_WARUNG_DATA");
-    if(data) {
-      try { appData = JSON.parse(data); } catch(e){}
+    const data = localStorage.getItem('warung_pos_data');
+    if (data) {
+      appData = JSON.parse(data);
     }
   }
 
   function switchTab(tabName) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    
-    const target = document.getElementById(`page-${tabName.toLowerCase()}`);
-    if(target) target.classList.add('active');
 
-    document.querySelectorAll('.nav-item').forEach(item => {
-      if(item.innerText.trim().toLowerCase() === tabName.toLowerCase()) item.classList.add('active');
-    });
+    const activePage = document.getElementById('page-' + tabName.toLowerCase());
+    if (activePage) activePage.classList.add('active');
 
-    if(tabName === 'Beranda') updateBeranda();
-    if(tabName === 'Kasir') { renderKasirProduk(); renderCart(); }
-    if(tabName === 'Produk') renderMasterProduk();
-    if(tabName === 'Kasbon') renderKasbon();
-    if(tabName === 'Laporan') renderLaporan();
-    if(tabName === 'Setting') initSettingsUI();
+    const navs = document.querySelectorAll('.nav-item');
+    if (tabName === 'Beranda') navs[0].classList.add('active');
+    if (tabName === 'Produk') navs[1].classList.add('active');
+    if (tabName === 'Kasir') navs[2].classList.add('active');
+    if (tabName === 'Kasbon') navs[3].classList.add('active');
+    if (tabName === 'Setting') navs[4].classList.add('active');
+
+    if (tabName === 'Beranda') renderDashboard();
+    if (tabName === 'Kasir') { renderKasirProduk(); renderCart(); }
+    if (tabName === 'Produk') renderMasterProduk();
+    if (tabName === 'Kasbon') renderKasbon();
+    if (tabName === 'Setting') loadSettingForm();
   }
 
-  // --- PEMINDAN BARCODE KAMERA ---
-  function bukaModalScanner(target) {
-    scanTarget = target;
-    document.getElementById('modalScanner').classList.add('active');
-    
-    html5QrcodeScanner = new Html5Qrcode("reader");
-    html5QrcodeScanner.start(
-      { facingMode: "environment" },
-      { fps: 10, qrbox: { width: 250, height: 150 } },
-      (decodedText) => {
-        onScanSuccess(decodedText);
-      },
-      (errorMessage) => {}
-    ).catch(err => {
-      alert("Kamera tidak dapat diakses atau izin ditolak.");
-      tutupModalScanner();
-    });
-  }
+  // FORCE-FIX LOGIKA ROKOK ECERAN (S.p, Evo, DLL)
+  function perbaikiTombolRokok() {
+    if (!appData || !appData.produk) return;
+    let adaPerubahan = false;
 
-  function onScanSuccess(decodedText) {
-    tutupModalScanner();
-    if(scanTarget === 'kasir') {
-      const p = appData.produk.find(x => x.barcode === decodedText);
-      if(p) {
-        addToCart(p.id, 'normal');
-        alert(`Produk ditemukan: ${p.nama}`);
-      } else {
-        alert(`Barcode ${decodedText} belum terdaftar di menu Produk.`);
+    appData.produk.forEach(p => {
+      const namaLower = (p.nama || '').toLowerCase();
+      const punyaHargaBtg = p.hargaBatang && Number(p.hargaBatang) > 0;
+
+      if (namaLower.includes('s.p') || namaLower.includes('evo') || punyaHargaBtg) {
+        if (!p.isRokok) {
+          p.isRokok = true;
+          adaPerubahan = true;
+        }
+        if (!p.hargaBatang || Number(p.hargaBatang) === 0) {
+          p.hargaBatang = 2000;
+          adaPerubahan = true;
+        }
+        if (!p.isiBatang) {
+          p.isiBatang = 16;
+          adaPerubahan = true;
+        }
+        if (p.stokBatang === undefined || p.stokBatang === null) {
+          p.stokBatang = 16;
+          adaPerubahan = true;
+        }
       }
-    } else if(scanTarget === 'produk') {
-      document.getElementById('p-barcode').value = decodedText;
-      alert(`Barcode berhasil di-scan: ${decodedText}`);
-    }
-  }
-
-  function tutupModalScanner() {
-    if(html5QrcodeScanner) {
-      html5QrcodeScanner.stop().then(() => {
-        html5QrcodeScanner.clear();
-        document.getElementById('modalScanner').classList.remove('active');
-      }).catch(() => {
-        document.getElementById('modalScanner').classList.remove('active');
-      });
-    } else {
-      document.getElementById('modalScanner').classList.remove('active');
-    }
-  }
-
-  // --- ITEM CUSTOM KAMERA ---
-  function bukaModalFotoCustomItem() {
-    tempFotoCustom = "";
-    document.getElementById('custom-nama').value = "";
-    document.getElementById('custom-harga').value = "";
-    document.getElementById('custom-foto-img').style.display = 'none';
-    document.getElementById('modalFotoCustomItem').classList.add('active');
-  }
-
-  function previewCustomFoto(e) {
-    const file = e.target.files[0];
-    if(file) {
-      const reader = new FileReader();
-      reader.onload = function(evt) {
-        tempFotoCustom = evt.target.result;
-        const img = document.getElementById('custom-foto-img');
-        img.src = tempFotoCustom;
-        img.style.display = 'block';
-      };
-      reader.readAsDataURL(file);
-    }
-  }
-
-  function tambahCustomItemKeCart() {
-    const nama = document.getElementById('custom-nama').value.trim() || "Item Fast Custom";
-    const harga = parseFloat(document.getElementById('custom-harga').value) || 0;
-    if(harga <= 0) { alert("Harga barang custom harus diisi!"); return; }
-
-    appData.cart.push({
-      produkId: Date.now(),
-      nama: nama,
-      harga: harga,
-      hpp: harga * (appData.config.defHppPct / 100),
-      qty: 1,
-      mode: 'custom',
-      foto: tempFotoCustom
     });
 
-    document.getElementById('modalFotoCustomItem').classList.remove('active');
-    renderCart();
+    if (adaPerubahan) {
+      saveLocal();
+    }
   }
 
-  // --- FOTO PRODUK BARU ---
-  function previewFotoProduk(e) {
-    const file = e.target.files[0];
-    if(file) {
+  // KELOLA KATEGORI
+  function renderKategori() {
+    const container = document.getElementById('kasir-kategori-filter');
+    const chipList = document.getElementById('kat-chip-list');
+    const selectKat = document.getElementById('p-kategori');
+
+    container.innerHTML = '';
+    chipList.innerHTML = '';
+    selectKat.innerHTML = '';
+
+    appData.kategori.forEach(kat => {
+      // Filter di Kasir
+      const btn = document.createElement('button');
+      btn.className = `filter-btn ${activeKatFilter === kat ? 'active' : ''}`;
+      btn.innerText = kat;
+      btn.onclick = () => { activeKatFilter = kat; renderKategori(); renderKasirProduk(); };
+      container.appendChild(btn);
+
+      // Select di Form Produk
+      if (kat !== 'Semua') {
+        const opt = document.createElement('option');
+        opt.value = kat;
+        opt.innerText = kat;
+        selectKat.appendChild(opt);
+
+        const chip = document.createElement('span');
+        chip.style.cssText = "background:#e2e8f0; font-size:11px; padding:3px 8px; border-radius:12px; margin-right:4px;";
+        chip.innerText = kat;
+        chipList.appendChild(chip);
+      }
+    });
+  }
+
+  function tambahKategori() {
+    const input = document.getElementById('kat-nama');
+    const val = input.value.trim();
+    if (val && !appData.kategori.includes(val)) {
+      appData.kategori.push(val);
+      input.value = '';
+      saveLocal();
+      renderKategori();
+    }
+  }
+
+  // KELOLA PRODUK (SIMPAN & RENDER)
+  function previewFotoProduk(event) {
+    const file = event.target.files[0];
+    if (file) {
       const reader = new FileReader();
-      reader.onload = function(evt) {
-        tempFotoProduct = evt.target.result;
+      reader.onload = function(e) {
+        tempFotoProduct = e.target.result;
         const img = document.getElementById('p-foto-img');
         img.src = tempFotoProduct;
         img.style.display = 'block';
@@ -580,705 +541,662 @@
     }
   }
 
-  // BERANDA
-  function updateBeranda() {
-    const today = new Date().toISOString().split('T')[0];
-    const txHariIni = appData.transaksi.filter(t => t.tanggal === today);
-    const omzet = txHariIni.reduce((acc, curr) => acc + curr.total, 0);
-    
-    document.getElementById('dash-omzet').innerText = `Rp ${omzet.toLocaleString('id-ID')}`;
-    document.getElementById('dash-transaksi').innerText = txHariIni.length;
+  function simpanProduk() {
+    const barcode = document.getElementById('p-barcode').value.trim();
+    const nama = document.getElementById('p-nama').value.trim();
+    const kategori = document.getElementById('p-kategori').value;
+    const harga = parseFloat(document.getElementById('p-harga').value) || 0;
+    const hpp = parseFloat(document.getElementById('p-hpp').value) || 0;
+    const stok = document.getElementById('p-stok').value !== '' ? parseInt(document.getElementById('p-stok').value) : null;
 
-    const menipis = appData.produk.filter(p => p.stok !== null && p.stok <= appData.config.minStok);
-    const stokWarnEl = document.getElementById('dash-stok-warning');
-    if(menipis.length > 0) {
-      stokWarnEl.innerText = `${menipis.length} Produk stoknya menyentuh/di bawah batas minimal! (${menipis.map(m=>m.nama).join(', ')})`;
-      stokWarnEl.style.color = "#dc2626";
+    const isiBt = document.getElementById('p-isi-btg').value;
+    const hrgBt = document.getElementById('p-hrg-btg').value;
+    const stokBt = document.getElementById('p-stok-btg').value;
+
+    if (!nama || harga <= 0) {
+      alert("Nama produk dan harga jual wajib diisi!");
+      return;
+    }
+
+    const itemData = {
+      barcode,
+      foto: tempFotoProduct,
+      nama,
+      kategori,
+      harga,
+      hpp,
+      stok,
+      isRokok: hrgBt && Number(hrgBt) > 0 ? true : false,
+      isiBatang: isiBt ? parseInt(isiBt) : null,
+      hargaBatang: hrgBt ? parseFloat(hrgBt) : null,
+      stokBatang: stokBt ? parseInt(stokBt) : 0
+    };
+
+    if (editId) {
+      const idx = appData.produk.findIndex(p => p.id === editId);
+      if (idx !== -1) {
+        appData.produk[idx] = { ...appData.produk[idx], ...itemData };
+      }
+      editId = null;
     } else {
-      stokWarnEl.innerText = "Semua stok dalam keadaan aman.";
-      stokWarnEl.style.color = "#666";
+      appData.produk.push({
+        id: Date.now(),
+        ...itemData
+      });
     }
-  }
 
-  // KATEGORI & KASIR
-  function renderKategoriUI() {
-    const chipContainer = document.getElementById('kat-chip-list');
-    chipContainer.innerHTML = appData.kategori.filter(k=>k!=='Semua').map(k => `
-      <span style="background:#e2e8f0; padding:3px 8px; border-radius:12px; font-size:11px;">
-        ${k} <b style="cursor:pointer; color:#ef4444;" onclick="hapusKategori('${k}')">&times;</b>
-      </span>
-    `).join('');
-
-    const filterContainer = document.getElementById('kasir-kategori-filter');
-    filterContainer.innerHTML = appData.kategori.map(k => `
-      <button class="filter-btn ${activeKasirKategori === k ? 'active':''}" onclick="setKasirKategori('${k}')">${k}</button>
-    `).join('');
-
-    const selectKat = document.getElementById('p-kategori');
-    selectKat.innerHTML = appData.kategori.filter(k=>k!=='Semua').map(k=>`<option value="${k}">${k}</option>`).join('');
-  }
-
-  function tambahKategori() {
-    const nama = document.getElementById('kat-nama').value.trim();
-    if(nama && !appData.kategori.includes(nama)) {
-      appData.kategori.push(nama);
-      document.getElementById('kat-nama').value = '';
-      saveLocal(); renderKategoriUI();
-    }
-  }
-
-  function hapusKategori(k) {
-    appData.kategori = appData.kategori.filter(item => item !== k);
-    saveLocal(); renderKategoriUI();
-  }
-
-  function setKasirKategori(k) {
-    activeKasirKategori = k;
-    renderKategoriUI();
+    saveLocal();
+    perbaikiTombolRokok();
+    renderMasterProduk();
     renderKasirProduk();
+    resetFormProduk();
+    alert("Produk berhasil disimpan!");
   }
 
-  function renderKasirProduk() {
-    const list = document.getElementById('kasir-produk-list');
-    const q = document.getElementById('kasir-search').value.toLowerCase();
-    
-    let items = appData.produk;
-    if(activeKasirKategori !== 'Semua') {
-      items = items.filter(p => p.kategori === activeKasirKategori);
-    }
-    if(q) {
-      items = items.filter(p => p.nama.toLowerCase().includes(q) || (p.barcode && p.barcode.includes(q)));
-    }
+  function resetFormProduk() {
+    document.getElementById('p-barcode').value = '';
+    document.getElementById('p-nama').value = '';
+    document.getElementById('p-harga').value = '';
+    document.getElementById('p-hpp').value = '';
+    document.getElementById('p-stok').value = '';
+    document.getElementById('p-isi-btg').value = '';
+    document.getElementById('p-hrg-btg').value = '';
+    document.getElementById('p-stok-btg').value = '';
+    document.getElementById('p-foto-img').style.display = 'none';
+    tempFotoProduct = "";
+  }
 
-    list.innerHTML = items.map(p => {
-      const isRokok = p.isiBatang && p.hargaBatang;
-      const imgTag = p.foto ? `<img src="${p.foto}" class="item-img-thumb">` : `<div class="item-img-thumb"></div>`;
-      return `
-        <div class="list-row">
-          <div style="display:flex; align-items:center;">
-            ${imgTag}
-            <div>
-              <b>${p.nama}</b>
-              <div style="font-size:10px; color:#666;">Rp ${p.harga.toLocaleString('id-ID')} | Stok: ${p.stok === null ? '∞':p.stok}</div>
-              ${p.barcode ? `<div style="font-size:9px; color:#94a3b8;">BC: ${p.barcode}</div>`:''}
-            </div>
-          </div>
+  function renderMasterProduk() {
+    const list = document.getElementById('master-produk-list');
+    list.innerHTML = '';
+
+    appData.produk.forEach(p => {
+      const row = document.createElement('div');
+      row.className = 'list-row';
+      row.innerHTML = `
+        <div style="display:flex; align-items:center;">
+          ${p.foto ? `<img src="${p.foto}" class="item-img-thumb">` : ''}
           <div>
-            ${isRokok ? `
-              <button class="btn btn-secondary" style="padding:4px 6px; font-size:10px;" onclick="addToCart(${p.id}, 'bungkus')">+ Bungkus</button>
-              <button class="btn btn-secondary" style="padding:4px 6px; font-size:10px; margin-top:2px;" onclick="addToCart(${p.id}, 'batang')">+ Batang (${p.stokBatang||0})</button>
-            ` : `
-              <button class="btn btn-primary" style="padding:4px 8px; font-size:10px;" onclick="addToCart(${p.id}, 'normal')">+ Tambah</button>
-            `}
+            <b>${p.nama}</b> <small>(${p.kategori})</small>
+            <div>Rp ${p.harga.toLocaleString('id-ID')} | Stok: ${p.stok !== null ? p.stok : '∞'}</div>
+            ${p.hargaBatang ? `<small style="color:#0d9488;">Eceran: Rp ${p.hargaBatang.toLocaleString('id-ID')}/btg</small>` : ''}
           </div>
+        </div>
+        <div>
+          <button class="btn btn-sm btn-secondary" onclick="editProduk(${p.id})">Edit</button>
+          <button class="btn btn-sm btn-danger" onclick="hapusProduk(${p.id})" style="margin-top:2px;">Hapus</button>
         </div>
       `;
-    }).join('');
+      list.appendChild(row);
+    });
   }
 
-  function addToCart(produkId, mode) {
-    const p = appData.produk.find(x => x.id === produkId);
-    if(!p) return;
-
-    if(mode === 'normal' || mode === 'bungkus') {
-      if(p.stok !== null && p.stok <= 0) { alert("Stok bungkus/produk habis!"); return; }
-      const exist = appData.cart.find(c => c.produkId === p.id && c.mode === mode);
-      if(exist) { exist.qty++; }
-      else {
-        appData.cart.push({ produkId: p.id, nama: p.nama, harga: p.harga, hpp: p.hpp||(p.harga*(appData.config.defHppPct/100)), qty: 1, mode: mode });
-      }
-    } else if(mode === 'batang') {
-      if((p.stokBatang || 0) <= 0) {
-        if(p.stok !== null && p.stok > 0) {
-          p.stok -= 1;
-          p.stokBatang = (p.stokBatang || 0) + parseInt(p.isiBatang);
-        } else {
-          alert("Stok batang dan bungkus habis!"); return;
-        }
-      }
-      const exist = appData.cart.find(c => c.produkId === p.id && c.mode === 'batang');
-      if(exist) { exist.qty++; }
-      else {
-        appData.cart.push({ produkId: p.id, nama: `${p.nama} (Batangan)`, harga: p.hargaBatang, hpp: (p.hpp/p.isiBatang)||(p.hargaBatang*(appData.config.defHppPct/100)), qty: 1, mode: 'batang' });
-      }
+  function editProduk(id) {
+    const p = appData.produk.find(x => x.id === id);
+    if (!p) return;
+    editId = p.id;
+    document.getElementById('p-barcode').value = p.barcode || '';
+    document.getElementById('p-nama').value = p.nama;
+    document.getElementById('p-kategori').value = p.kategori;
+    document.getElementById('p-harga').value = p.harga;
+    document.getElementById('p-hpp').value = p.hpp || '';
+    document.getElementById('p-stok').value = p.stok !== null ? p.stok : '';
+    document.getElementById('p-isi-btg').value = p.isiBatang || '';
+    document.getElementById('p-hrg-btg').value = p.hargaBatang || '';
+    document.getElementById('p-stok-btg').value = p.stokBatang || '';
+    
+    if (p.foto) {
+      tempFotoProduct = p.foto;
+      const img = document.getElementById('p-foto-img');
+      img.src = p.foto;
+      img.style.display = 'block';
     }
-    renderCart();
   }
 
-  function renderCart() {
-    const cartList = document.getElementById('kasir-cart-list');
-    cartList.innerHTML = appData.cart.map((c, idx) => `
-      <div class="list-row">
-        <div><b>${c.nama}</b><div>Rp ${c.harga.toLocaleString('id-ID')} x ${c.qty}</div></div>
-        <div style="display:flex; gap:4px; align-items:center;">
-          <b>Rp ${(c.harga * c.qty).toLocaleString('id-ID')}</b>
-          <button class="btn btn-danger" style="padding:2px 6px;" onclick="changeCartQty(${idx}, -1)">-</button>
-          <button class="btn btn-secondary" style="padding:2px 6px;" onclick="changeCartQty(${idx}, 1)">+</button>
+  function hapusProduk(id) {
+    if (confirm("Yakin ingin menghapus produk ini?")) {
+      appData.produk = appData.produk.filter(p => p.id !== id);
+      saveLocal();
+      renderMasterProduk();
+      renderKasirProduk();
+    }
+  }
+
+  // TAMPILAN KATALOG KASIR (TOMBOL ECERAN DIPAKSA MUNCUL JIKA ADA HARGA BATANG)
+  function renderKasirProduk() {
+    const list = document.getElementById('kasir-produk-list');
+    const search = document.getElementById('kasir-search').value.toLowerCase();
+    list.innerHTML = '';
+
+    const filtered = appData.produk.filter(p => {
+      const matchKat = (activeKatFilter === 'Semua' || p.kategori === activeKatFilter);
+      const matchSearch = p.nama.toLowerCase().includes(search) || (p.barcode && p.barcode.toLowerCase().includes(search));
+      return matchKat && matchSearch;
+    });
+
+    filtered.forEach(p => {
+      const row = document.createElement('div');
+      row.className = 'list-row';
+
+      // Pengecekan mutlak apakah rokok eceran
+      const isEceran = Boolean(p.isRokok) || (p.hargaBatang && Number(p.hargaBatang) > 0);
+
+      let actionBtn = '';
+      if (isEceran) {
+        actionBtn = `
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <button class="btn btn-sm btn-outline-primary" onclick="tambahKeCart(${p.id}, 'bungkus')">+ Bungkus</button>
+            <button class="btn btn-sm btn-outline-secondary" onclick="tambahKeCart(${p.id}, 'batang')">+ Batang (${p.stokBatang || 0})</button>
+          </div>
+        `;
+      } else {
+        actionBtn = `<button class="btn btn-sm btn-primary" onclick="tambahKeCart(${p.id}, 'bungkus')">+ Tambah</button>`;
+      }
+
+      row.innerHTML = `
+        <div style="display:flex; align-items:center;">
+          ${p.foto ? `<img src="${p.foto}" class="item-img-thumb">` : ''}
+          <div>
+            <b>${p.nama}</b>
+            <div>Rp ${p.harga.toLocaleString('id-ID')} | Stok: ${p.stok !== null ? p.stok : '∞'}</div>
+            ${p.barcode ? `<small style="color:#94a3b8;">BC: ${p.barcode}</small>` : ''}
+          </div>
         </div>
-      </div>
-    `).join('');
-
-    const total = appData.cart.reduce((sum, item) => sum + (item.harga * item.qty), 0);
-    document.getElementById('kasir-total').value = total;
-    hitungKembalian();
+        ${actionBtn}
+      `;
+      list.appendChild(row);
+    });
   }
 
-  function changeCartQty(idx, change) {
-    appData.cart[idx].qty += change;
-    if(appData.cart[idx].qty <= 0) appData.cart.splice(idx, 1);
+  // KERANJANG TRANSAKSI & PEMBAYARAN
+  function tambahKeCart(id, tipe = 'bungkus') {
+    const p = appData.produk.find(x => x.id === id);
+    if (!p) return;
+
+    const cartKey = `${p.id}_${tipe}`;
+    const itemInCart = appData.keranjang.find(x => x.cartKey === cartKey);
+
+    const isBatang = (tipe === 'batang');
+    const hargaJual = isBatang ? p.hargaBatang : p.harga;
+    const labelNama = isBatang ? `${p.nama} (Batangan)` : p.nama;
+
+    if (itemInCart) {
+      itemInCart.qty += 1;
+    } else {
+      appData.keranjang.push({
+        cartKey,
+        id: p.id,
+        nama: labelNama,
+        harga: hargaJual,
+        hpp: isBatang ? ((p.hpp || 0) / (p.isiBatang || 1)) : (p.hpp || 0),
+        qty: 1,
+        tipe: tipe
+      });
+    }
+
     renderCart();
   }
 
   function tambahSeblakKeCart() {
-    const harga = parseFloat(document.getElementById('seblak-harga').value) || 0;
+    const hrg = parseFloat(document.getElementById('seblak-harga').value) || 0;
     const cat = document.getElementById('seblak-catatan').value.trim();
-    if(harga <= 0) { alert("Nominal harga seblak harus diisi!"); return; }
 
-    const namaSeblak = cat ? `Seblak Custom (${cat})` : "Seblak Prasmanan";
-    appData.cart.push({
-      produkId: Date.now(),
-      nama: namaSeblak,
-      harga: harga,
-      hpp: harga * (appData.config.defHppPct / 100),
+    if (hrg <= 0) {
+      alert("Masukkan nominal harga seblak!");
+      return;
+    }
+
+    appData.keranjang.push({
+      cartKey: `seblak_${Date.now()}`,
+      id: `seblak_${Date.now()}`,
+      nama: `Seblak Prasmanan ${cat ? `(${cat})` : ''}`,
+      harga: hrg,
+      hpp: hrg * 0.6, // Estimasi HPP Modal
       qty: 1,
-      mode: 'seblak'
+      tipe: 'seblak'
     });
 
     document.getElementById('seblak-harga').value = '';
     document.getElementById('seblak-catatan').value = '';
-    alert("Seblak berhasil dimasukkan ke keranjang kasir!");
     switchTab('Kasir');
   }
 
-  function renderKasirPayUI() {
-    const selectMetode = document.getElementById('kasir-metode');
-    selectMetode.innerHTML = appData.config.metodeBayar.map(m => `<option value="${m}">${m}</option>`).join('');
-    
-    const uiTunai = document.getElementById('ui-tunai');
-    if(selectMetode.value === 'Tunai') { uiTunai.style.display = 'block'; }
-    else { uiTunai.style.display = 'none'; }
+  function renderCart() {
+    const list = document.getElementById('kasir-cart-list');
+    list.innerHTML = '';
+    let total = 0;
+
+    appData.keranjang.forEach((item, index) => {
+      const subtotal = item.harga * item.qty;
+      total += subtotal;
+
+      const row = document.createElement('div');
+      row.className = 'list-row';
+      row.innerHTML = `
+        <div>
+          <b>${item.nama}</b>
+          <div>@ Rp ${item.harga.toLocaleString('id-ID')} x ${item.qty} = Rp ${subtotal.toLocaleString('id-ID')}</div>
+        </div>
+        <div style="display:flex; gap:4px; align-items:center;">
+          <button class="btn btn-sm btn-secondary" onclick="ubahQtyCart(${index}, -1)">-</button>
+          <span>${item.qty}</span>
+          <button class="btn btn-sm btn-secondary" onclick="ubahQtyCart(${index}, 1)">+</button>
+          <button class="btn btn-sm btn-danger" onclick="hapusCart(${index})">x</button>
+        </div>
+      `;
+      list.appendChild(row);
+    });
+
+    document.getElementById('kasir-total').value = total;
     hitungKembalian();
+  }
+
+  function ubahQtyCart(index, delta) {
+    appData.keranjang[index].qty += delta;
+    if (appData.keranjang[index].qty <= 0) {
+      appData.keranjang.splice(index, 1);
+    }
+    renderCart();
+  }
+
+  function hapusCart(index) {
+    appData.keranjang.splice(index, 1);
+    renderCart();
+  }
+
+  function renderKasirPayUI() {
+    const select = document.getElementById('kasir-metode');
+    select.innerHTML = `
+      <option value="Tunai">Tunai</option>
+      <option value="QRIS">QRIS / Transfer</option>
+      <option value="Kasbon">Kasbon / Piutang</option>
+    `;
   }
 
   function setCash(val) {
     const total = parseFloat(document.getElementById('kasir-total').value) || 0;
-    if(val === 'pas') document.getElementById('kasir-bayar').value = total;
-    else document.getElementById('kasir-bayar').value = val;
+    const input = document.getElementById('kasir-bayar');
+    if (val === 'pas') {
+      input.value = total;
+    } else {
+      input.value = val;
+    }
     hitungKembalian();
   }
 
   function hitungKembalian() {
     const total = parseFloat(document.getElementById('kasir-total').value) || 0;
-    const metode = document.getElementById('kasir-metode').value;
     const bayar = parseFloat(document.getElementById('kasir-bayar').value) || 0;
-    const textEl = document.getElementById('text-kembalian');
-    const containerBtn = document.getElementById('btn-pay-container');
-
-    if(metode !== 'Tunai') {
-      textEl.innerText = "Kembalian: Rp 0";
-      containerBtn.innerHTML = `<button class="btn btn-primary" style="width:100%" onclick="prosesBayar()">Bayar & Cetak Struk</button>`;
-      return;
-    }
-
     const kembalian = bayar - total;
-    if(kembalian >= 0) {
-      textEl.innerText = `Kembalian: Rp ${kembalian.toLocaleString('id-ID')}`;
-      textEl.style.color = '#0d9488';
-      containerBtn.innerHTML = `<button class="btn btn-primary" style="width:100%" onclick="prosesBayar()">Bayar & Cetak Struk</button>`;
-    } else {
-      textEl.innerText = `Kurang: Rp ${Math.abs(kembalian).toLocaleString('id-ID')}`;
-      textEl.style.color = '#dc2626';
-      containerBtn.innerHTML = `
-        <div class="btn-grid">
-          <button class="btn btn-primary" onclick="prosesBayar()">Bayar Pas</button>
-          <button class="btn btn-warning" onclick="bukaModalKasbonDirect()">Jadikan Kasbon</button>
-        </div>
-      `;
-    }
+    document.getElementById('text-kembalian').innerText = `Kembalian: Rp ${kembalian >= 0 ? kembalian.toLocaleString('id-ID') : 0}`;
   }
 
   function prosesBayar() {
     const total = parseFloat(document.getElementById('kasir-total').value) || 0;
     const metode = document.getElementById('kasir-metode').value;
-    let bayar = parseFloat(document.getElementById('kasir-bayar').value) || 0;
-    if(metode !== 'Tunai') bayar = total;
+    const bayar = parseFloat(document.getElementById('kasir-bayar').value) || 0;
 
-    if(appData.cart.length === 0) { alert("Keranjang belanja masih kosong!"); return; }
-    if(metode === 'Tunai' && bayar < total) { alert("Nominal pembayaran kurang!"); return; }
+    if (appData.keranjang.length === 0) {
+      alert("Keranjang belanja masih kosong!");
+      return;
+    }
 
-    const totalHpp = appData.cart.reduce((sum, item) => sum + (item.hpp * item.qty), 0);
+    if (metode === 'Tunai' && bayar < total) {
+      alert("Uang pembayaran kurang!");
+      return;
+    }
 
-    appData.cart.forEach(c => {
-      const p = appData.produk.find(x => x.id === c.produkId);
-      if(p) {
-        if(c.mode === 'bungkus' || c.mode === 'normal') {
-          if(p.stok !== null) p.stok -= c.qty;
-        } else if(c.mode === 'batang') {
-          p.stokBatang -= c.qty;
+    let namaPelanggan = "";
+    if (metode === 'Kasbon') {
+      namaPelanggan = prompt("Masukkan Nama Pelanggan Kasbon:");
+      if (!namaPelanggan) {
+        alert("Nama pelanggan wajib diisi untuk transaksi kasbon!");
+        return;
+      }
+    }
+
+    // Potong Stok
+    appData.keranjang.forEach(item => {
+      const p = appData.produk.find(x => x.id === item.id);
+      if (p) {
+        if (item.tipe === 'batang') {
+          if (p.stokBatang !== undefined) p.stokBatang -= item.qty;
+        } else if (item.tipe === 'bungkus' && p.stok !== null) {
+          p.stok -= item.qty;
         }
       }
     });
 
-    const tx = {
-      id: Date.now(),
-      tanggal: new Date().toISOString().split('T')[0],
-      items: [...appData.cart],
-      total: total,
-      hpp: totalHpp,
-      metode: metode,
-      bayar: bayar,
-      kembalian: bayar - total
+    const trx = {
+      id: `TRX-${Date.now()}`,
+      waktu: new Date().toLocaleString('id-ID'),
+      item: [...appData.keranjang],
+      total,
+      metode,
+      bayar: metode === 'Tunai' ? bayar : total,
+      kembali: metode === 'Tunai' ? (bayar - total) : 0,
+      pelanggan: namaPelanggan
     };
-    appData.transaksi.push(tx);
 
-    tampilkanStruk(tx);
-    appData.cart = [];
+    appData.transaksi.push(trx);
+
+    if (metode === 'Kasbon') {
+      appData.kasbon.push({
+        id: Date.now(),
+        nama: namaPelanggan,
+        total,
+        status: 'Belum Lunas',
+        waktu: trx.waktu
+      });
+    }
+
+    cetakStruk(trx);
+    appData.keranjang = [];
+    document.getElementById('kasir-bayar').value = '';
     saveLocal();
+    renderCart();
+    renderKasirProduk();
+  }
+
+  function cetakStruk(trx) {
+    const div = document.getElementById('struk-print');
+    let itemRows = '';
+    trx.item.forEach(i => {
+      itemRows += `
+        <div class="receipt-row">
+          <span>${i.nama} x${i.qty}</span>
+          <span>Rp ${(i.harga * i.qty).toLocaleString('id-ID')}</span>
+        </div>
+      `;
+    });
+
+    div.innerHTML = `
+      <div class="receipt-header">
+        <b>${appData.setting.nama}</b><br>
+        <small>${appData.setting.alamat}</small><br>
+        <small>WA: ${appData.setting.wa}</small>
+      </div>
+      <div>ID: ${trx.id}</div>
+      <div>Tgl: ${trx.waktu}</div>
+      ${trx.pelanggan ? `<div>Pelanggan: ${trx.pelanggan}</div>` : ''}
+      <hr style="margin:4px 0; border:none; border-top:1px dashed #000;">
+      ${itemRows}
+      <hr style="margin:4px 0; border:none; border-top:1px dashed #000;">
+      <div class="receipt-row"><b>Total:</b> <b>Rp ${trx.total.toLocaleString('id-ID')}</b></div>
+      <div class="receipt-row"><span>Metode:</span> <span>${trx.metode}</span></div>
+      <div class="receipt-row"><span>Bayar:</span> <span>Rp ${trx.bayar.toLocaleString('id-ID')}</span></div>
+      <div class="receipt-row"><span>Kembali:</span> <span>Rp ${trx.kembali.toLocaleString('id-ID')}</span></div>
+      <hr style="margin:4px 0; border:none; border-top:1px dashed #000;">
+      <center><small>${appData.setting.footer}</small></center>
+    `;
+
+    document.getElementById('modal-struk').classList.add('active');
+  }
+
+  function tutupModalStruk() {
+    document.getElementById('modal-struk').classList.remove('active');
+  }
+
+  // MODAL CUSTOM FOTO ITEM
+  function bukaModalFotoCustomItem() {
+    document.getElementById('modal-foto-custom').classList.add('active');
+  }
+
+  function tutupModalFotoCustomItem() {
+    document.getElementById('modal-foto-custom').classList.remove('active');
+    document.getElementById('custom-nama').value = '';
+    document.getElementById('custom-harga').value = '';
+    document.getElementById('custom-foto-preview').style.display = 'none';
+    tempCustomFoto = "";
+  }
+
+  function previewCustomFoto(event) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        tempCustomFoto = e.target.result;
+        const img = document.getElementById('custom-foto-preview');
+        img.src = tempCustomFoto;
+        img.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  function simpanCustomFotoKeCart() {
+    const nama = document.getElementById('custom-nama').value.trim() || 'Barang Foto Cepat';
+    const harga = parseFloat(document.getElementById('custom-harga').value) || 0;
+
+    if (harga <= 0) {
+      alert("Masukkan harga jual!");
+      return;
+    }
+
+    appData.keranjang.push({
+      cartKey: `custom_${Date.now()}`,
+      id: `custom_${Date.now()}`,
+      nama: nama,
+      harga: harga,
+      hpp: harga * 0.7,
+      qty: 1,
+      tipe: 'custom'
+    });
+
+    tutupModalFotoCustomItem();
     renderCart();
   }
 
-  function bukaModalKasbonDirect() {
-    if(appData.cart.length === 0) { alert("Keranjang belanja kosong!"); return; }
-    document.getElementById('modalKasbonDirect').classList.add('active');
+  // SCANNER KAMERA
+  function bukaModalScanner(target) {
+    scanModeTarget = target;
+    document.getElementById('modal-scanner').classList.add('active');
+
+    html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
+    html5QrcodeScanner.render(onScanSuccess);
   }
 
-  function simpanKasbonDirect() {
-    const nama = document.getElementById('kd-nama').value.trim();
-    const tempo = document.getElementById('kd-tempo').value;
-    const total = parseFloat(document.getElementById('kasir-total').value) || 0;
-    const bayar = parseFloat(document.getElementById('kasir-bayar').value) || 0;
-    const sisa = total - bayar;
-
-    if(!nama || !tempo) { alert("Nama dan tanggal jatuh tempo wajib diisi!"); return; }
-
-    appData.kasbon.push({
-      id: Date.now(),
-      nama: nama,
-      totalUtang: sisa,
-      sisaUtang: sisa,
-      tempo: tempo,
-      status: "Belum Lunas",
-      history: [{ tanggal: new Date().toISOString().split('T')[0], nominal: bayar, ket: "DP / Bayar Awal" }]
-    });
-
-    document.getElementById('modalKasbonDirect').classList.remove('active');
-    document.getElementById('kd-nama').value = '';
-    alert("Berhasil dicatat ke Halaman Kasbon!");
-    appData.cart = [];
-    saveLocal();
-    switchTab('Kasbon');
-  }
-
-  function tampilkanStruk(tx) {
-    document.getElementById('st-nama').innerText = appData.config.namaToko;
-    document.getElementById('st-alamat').innerText = appData.config.alamat;
-    document.getElementById('st-wa').innerText = `WA: ${appData.config.wa}`;
-    document.getElementById('st-total').innerText = `Rp ${tx.total.toLocaleString('id-ID')}`;
-    document.getElementById('st-metode').innerText = tx.metode;
-    document.getElementById('st-bayar').innerText = `Rp ${tx.bayar.toLocaleString('id-ID')}`;
-    document.getElementById('st-kembali').innerText = `Rp ${tx.kembalian.toLocaleString('id-ID')}`;
-    document.getElementById('st-footer').innerText = appData.config.footer;
-
-    const itemsEl = document.getElementById('st-items');
-    itemsEl.innerHTML = tx.items.map(i => `
-      <div class="receipt-row"><span>${i.nama} x${i.qty}</span><span>Rp ${(i.harga*i.qty).toLocaleString('id-ID')}</span></div>
-    `).join('');
-
-    document.getElementById('modalStruk').classList.add('active');
-  }
-
-  function tutupStruk() {
-    document.getElementById('modalStruk').classList.remove('active');
-    switchTab('Beranda');
-  }
-
-  // MASTER PRODUK
-  function simpanProduk() {
-  const barcode = document.getElementById('p-barcode').value;
-  const nama = document.getElementById('p-nama').value;
-  const kategori = document.getElementById('p-kategori').value;
-  const harga = parseFloat(document.getElementById('p-harga').value) || 0;
-  const hpp = parseFloat(document.getElementById('p-hpp').value) || 0;
-  const stokRaw = document.getElementById('p-stok').value;
-  const stok = stokRaw === "" ? null : parseInt(stokRaw);
-
-  const isiBt = document.getElementById('p-isi-bt')?.value;
-  const hrgBt = document.getElementById('p-hrg-bt')?.value;
-  const stokBt = document.getElementById('p-stok-bt')?.value;
-
-  if (!nama || harga <= 0) { alert("Nama dan harga harus diisi!"); return; }
-
-  if (editId) {
-    // Jika sedang mode Edit
-    const index = appData.produk.findIndex(p => p.id == editId);
-    if (index !== -1) {
-      appData.produk[index] = {
-  barcode, nama, kategori, harga, hpp, stok,
-  isRokok: hrgBt ? true : false,
-  isiBatang: isiBt ? parseInt(isiBt) : null,
-  hargaBatang: hrgBt ? parseFloat(hrgBt) : null,
-  stokBatang: stokBt ? parseInt(stokBt) : 0
-};
+  function onScanSuccess(decodedText) {
+    if (html5QrcodeScanner) {
+      html5QrcodeScanner.clear();
     }
-    editId = null; // Reset kembali
-      } else {
-      // Jika mode Tambah Baru
-      appData.produk.push({
-        id: Date.now(),
-        barcode, foto: tempFotoProduct, nama, kategori, harga, hpp, stok,
-        isRokok: hrgBt ? true : false,
-        isiBatang: isiBt ? parseInt(isiBt) : null,
-        hargaBatang: hrgBt ? parseFloat(hrgBt) : null,
-        stokBatang: stokBt ? parseInt(stokBt) : 0
-      });
+    document.getElementById('modal-scanner').classList.remove('active');
+
+    if (scanModeTarget === 'kasir') {
+      document.getElementById('kasir-search').value = decodedText;
+      renderKasirProduk();
+    } else if (scanModeTarget === 'produk') {
+      document.getElementById('p-barcode').value = decodedText;
     }
-  saveLocal(); 
-  renderMasterProduk();
-  alert(editId ? "Produk berhasil diperbarui!" : "Produk berhasil disimpan!");
-
-  // Reset Form
-  document.getElementById('p-barcode').value = '';
-  document.getElementById('p-nama').value = '';
-  document.getElementById('p-harga').value = '';
-  document.getElementById('p-hpp').value = '';
-  document.getElementById('p-stok').value = '';
-  if (document.getElementById('p-isi-bt')) document.getElementById('p-isi-bt').value = '';
-  if (document.getElementById('p-hrg-bt')) document.getElementById('p-hrg-bt').value = '';
-  if (document.getElementById('p-stok-bt')) document.getElementById('p-stok-bt').value = '';
-  tempFotoProduct = "";
-}
-
-
-  function renderMasterProduk() {
-    const list = document.getElementById('master-produk-list');
-    list.innerHTML = appData.produk.map(p => {
-      const imgTag = p.foto ? `<img src="${p.foto}" class="item-img-thumb">` : `<div class="item-img-thumb"></div>`;
-      return `
-        <div class="list-row">
-          <div style="display:flex; align-items:center;">
-            ${imgTag}
-            <div>
-              <b>${p.nama}</b> (${p.kategori})
-              <div style="font-size:10px; color:#666;">Harga: Rp ${p.harga.toLocaleString('id-ID')} | HPP: Rp ${p.hpp.toLocaleString('id-ID')} | Stok: ${p.stok === null ? '∞':p.stok}</div>
-              ${p.barcode ? `<div style="font-size:9px; color:#94a3b8;">BC: ${p.barcode}</div>`:''}
-              ${p.isiBatang ? `<div style="font-size:10px; color:#0d9488;">Eceran: Rp ${p.hargaBatang.toLocaleString('id-ID')}/btg | Stok Btg: ${p.stokBatang}</div>`:''}
-            </div>
-          </div>
-          <button class="btn" onclick="editProduk('${p.id}')" style="padding:4px 8px; background-color:#0284c7; color:white; border:none; border-radius:4px; margin-right:4px; font-weight:bold;">Edit</button>
-          <button class="btn btn-danger" style="padding:4px 8px; font-size:10px;" onclick="hapusProduk(${p.id})">Hapus</button>
-        </div>
-      `;
-    }).join('');
   }
 
-  function hapusProduk(id) {
-  appData.produk = appData.produk.filter(p => p.id !== id);
-  saveLocal();
-  renderMasterProduk();
-}
-let editId = null;
-
-function editProduk(id) {
-  const p = appData.produk.find(item => item.id == id);
-  if (!p) return;
-
-  editId = id;
-
-  document.getElementById('p-barcode').value = p.barcode || '';
-  document.getElementById('p-nama').value = p.nama || '';
-  document.getElementById('p-kategori').value = p.kategori || '';
-  document.getElementById('p-harga').value = p.harga || '';
-  document.getElementById('p-hpp').value = p.hpp || '';
-  document.getElementById('p-stok').value = p.stok !== null ? p.stok : '';
-
-  if (document.getElementById('p-isi-bt')) document.getElementById('p-isi-bt').value = p.isiBatang || '';
-  if (document.getElementById('p-hrg-bt')) document.getElementById('p-hrg-bt').value = p.hargaBatang || '';
-  if (document.getElementById('p-stok-bt')) document.getElementById('p-stok-bt').value = p.stokBatang || '';
-
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-  // EXCEL CSV PRODUK
-  function downloadTemplateProdukCSV() {
-    const csvStr = "Barcode,Nama Produk,Kategori,Harga Jual,HPP Modal,Stok,Isi Per Bungkus,Harga Per Batang,Stok Batang\n899990800001,Sample Rokok,Rokok,25000,21000,10,12,2500,0\n,Sample Minuman,Minuman,5000,3000,,,";
-    downloadBlob(csvStr, "Template_Produk_KasirWarung.csv", "text/csv");
-  }
-
-  function exportProdukCSV() {
-    let csv = "ID,Barcode,Nama Produk,Kategori,Harga Jual,HPP Modal,Stok,Isi Per Bungkus,Harga Per Batang,Stok Batang\n";
-    appData.produk.forEach(p => {
-      csv += `${p.id},"${p.barcode||''}" "${p.nama}",${p.kategori},${p.harga},${p.hpp},${p.stok||''},${p.isiBatang||''},${p.hargaBatang||''},${p.stokBatang||0}\n`;
-    });
-    downloadBlob(csv, `Master_Produk_${Date.now()}.csv`, "text/csv");
-  }
-
-  function importProdukCSV(event) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const lines = e.target.result.split('\n');
-      for(let i=1; i<lines.length; i++) {
-        if(!lines[i].trim()) continue;
-        const col = lines[i].split(',');
-        if(col.length >= 5) {
-          appData.produk.push({
-            id: Date.now() + i,
-            barcode: col[0] ? col[0].replace(/"/g, '') : '',
-            nama: col[1] ? col[1].replace(/"/g, '') : 'Produk Import',
-            kategori: col[2] || "Semua",
-            harga: parseFloat(col[3]) || 0,
-            hpp: parseFloat(col[4]) || 0,
-            stok: col[5] ? parseInt(col[5]) : null,
-            isiBatang: col[6] ? parseInt(col[6]) : null,
-            hargaBatang: col[7] ? parseFloat(col[7]) : null,
-            stokBatang: col[8] ? parseInt(col[8]) : 0
-          });
-        }
-      }
-      saveLocal(); renderMasterProduk();
-      alert("Import CSV Produk Berhasil!");
-    };
-    reader.readAsText(event.target.files[0]);
+  function tutupModalScanner() {
+    if (html5QrcodeScanner) {
+      html5QrcodeScanner.clear();
+    }
+    document.getElementById('modal-scanner').classList.remove('active');
   }
 
   // KASBON
   function renderKasbon() {
     const list = document.getElementById('kasbon-list');
-    const today = new Date().toISOString().split('T')[0];
+    list.innerHTML = '';
 
-    list.innerHTML = appData.kasbon.map(k => {
-      const isJatuhTempo = k.status !== 'Lunas' && k.tempo < today;
-      return `
-        <div class="list-row" style="flex-direction:column; align-items:flex-start; gap:4px;">
-          <div style="display:flex; justify-content:space-between; width:100%;">
-            <b>${k.nama}</b>
-            <span class="${k.status === 'Lunas' ? 'badge-success':'badge-danger'}">${k.status}</span>
-          </div>
-          <div style="font-size:11px; color:#666;">
-            Sisa Utang: <b style="color:#ef4444;">Rp ${k.sisaUtang.toLocaleString('id-ID')}</b> / Total: Rp ${k.totalUtang.toLocaleString('id-ID')}
-          </div>
-          <div style="font-size:10px;">
-            Tempo: ${k.tempo} ${isJatuhTempo ? '<span class="badge-danger">JATUH TEMPO!</span>':''}
-          </div>
-          ${k.status !== 'Lunas' ? `<button class="btn btn-primary" style="padding:4px 8px; font-size:10px; margin-top:4px;" onclick="bukaModalCicil(${k.id})">Bayar / Cicil</button>`:''}
+    appData.kasbon.forEach((k, idx) => {
+      const row = document.createElement('div');
+      row.className = 'list-row';
+      row.innerHTML = `
+        <div>
+          <b>${k.nama}</b> <span class="${k.status === 'Lunas' ? 'badge-success' : 'badge-danger'}">${k.status}</span>
+          <div>Total: Rp ${k.total.toLocaleString('id-ID')} | <small>${k.waktu}</small></div>
         </div>
+        ${k.status === 'Belum Lunas' ? `<button class="btn btn-sm btn-primary" onclick="pelunasanKasbon(${idx})">Pelunasan</button>` : ''}
       `;
-    }).join('');
-  }
-
-  function bukaModalCicil(id) {
-    activeCicilId = id;
-    const k = appData.kasbon.find(x => x.id === id);
-    document.getElementById('mc-nama').innerText = k.nama;
-    document.getElementById('mc-sisa').innerText = `Rp ${k.sisaUtang.toLocaleString('id-ID')}`;
-    document.getElementById('modalCicil').classList.add('active');
-  }
-
-  function prosesCicil() {
-    const nom = parseFloat(document.getElementById('mc-nominal').value) || 0;
-    const k = appData.kasbon.find(x => x.id === activeCicilId);
-    if(nom <= 0) { alert("Nominal bayar valid wajib diisi!"); return; }
-
-    k.sisaUtang -= nom;
-    if(k.sisaUtang <= 0) {
-      k.sisaUtang = 0;
-      k.status = "Lunas";
-    }
-    k.history.push({ tanggal: new Date().toISOString().split('T')[0], nominal: nom });
-
-    document.getElementById('modalCicil').classList.remove('active');
-    document.getElementById('mc-nominal').value = '';
-    saveLocal(); renderKasbon();
-    alert("Pembayaran cicilan berhasil dicatat!");
-  }
-
-  // LAPORAN
-  function renderLaporan() {
-    const omzet = appData.transaksi.reduce((sum, t) => sum + t.total, 0);
-    const hpp = appData.transaksi.reduce((sum, t) => sum + t.hpp, 0);
-    const laba = omzet - hpp;
-
-    document.getElementById('lap-omzet').innerText = `Rp ${omzet.toLocaleString('id-ID')}`;
-    document.getElementById('lap-hpp').innerText = `Rp ${hpp.toLocaleString('id-ID')}`;
-    document.getElementById('lap-laba').innerText = `Rp ${laba.toLocaleString('id-ID')}`;
-  }
-
-  function exportLaporanCSV() {
-    let csv = "ID Transaksi,Tanggal,Total Omzet,HPP Modal,Laba Bersih,Metode Pembayaran\n";
-    appData.transaksi.forEach(t => {
-      csv += `${t.id},${t.tanggal},${t.total},${t.hpp},${t.total - t.hpp},${t.metode}\n`;
+      list.appendChild(row);
     });
-    downloadBlob(csv, `Laporan_Transaksi_${Date.now()}.csv`, "text/csv");
   }
 
-  // SETTINGS & BACKUP JSON
-  function initSettingsUI() {
-    document.getElementById('cfg-nama').value = appData.config.namaToko;
-    document.getElementById('cfg-alamat').value = appData.config.alamat;
-    document.getElementById('cfg-wa').value = appData.config.wa;
-    document.getElementById('cfg-footer').value = appData.config.footer;
-    document.getElementById('cfg-minstok').value = appData.config.minStok;
-    document.getElementById('cfg-defhpp').value = appData.config.defHppPct;
-    document.getElementById('cfg-metode').value = appData.config.metodeBayar.join(', ');
+  function pelunasanKasbon(index) {
+    if (confirm("Tandai kasbon ini sebagai Lunas?")) {
+      appData.kasbon[index].status = 'Lunas';
+      saveLocal();
+      renderKasbon();
+    }
   }
 
-  function simpanPengaturan() {
-    appData.config.namaToko = document.getElementById('cfg-nama').value;
-    appData.config.alamat = document.getElementById('cfg-alamat').value;
-    appData.config.wa = document.getElementById('cfg-wa').value;
-    appData.config.footer = document.getElementById('cfg-footer').value;
-    appData.config.minStok = parseInt(document.getElementById('cfg-minstok').value) || 5;
-    appData.config.defHppPct = parseFloat(document.getElementById('cfg-defhpp').value) || 60;
-    
-    const met = document.getElementById('cfg-metode').value.split(',').map(s=>s.trim()).filter(s=>s);
-    if(met.length > 0) appData.config.metodeBayar = met;
+  // DASHBOARD & LAPORAN
+  function renderDashboard() {
+    const today = new Date().toLocaleDateString('id-ID');
+    const trxToday = appData.transaksi.filter(t => t.waktu.includes(today));
+
+    let totalOmzet = 0;
+    let totalHPP = 0;
+
+    appData.transaksi.forEach(t => {
+      totalOmzet += t.total;
+      t.item.forEach(i => {
+        totalHPP += (i.hpp || 0) * i.qty;
+      });
+    });
+
+    document.getElementById('dash-omzet').innerText = `Rp ${trxToday.reduce((a, b) => a + b.total, 0).toLocaleString('id-ID')}`;
+    document.getElementById('dash-transaksi').innerText = trxToday.length;
+
+    document.getElementById('lap-omzet').innerText = `Rp ${totalOmzet.toLocaleString('id-ID')}`;
+    document.getElementById('lap-hpp').innerText = `Rp ${totalHPP.toLocaleString('id-ID')}`;
+    document.getElementById('lap-laba').innerText = `Rp ${(totalOmzet - totalHPP).toLocaleString('id-ID')}`;
+
+    // Warning Stok
+    const minStok = appData.setting.minStok || 5;
+    const lowStock = appData.produk.filter(p => p.stok !== null && p.stok <= minStok);
+    const warnDiv = document.getElementById('dash-stok-warning');
+
+    if (lowStock.length > 0) {
+      warnDiv.innerHTML = lowStock.map(p => `<div style="color:#ef4444;">⚠️ <b>${p.nama}</b> sisa ${p.stok}</div>`).join('');
+    } else {
+      warnDiv.innerText = "Semua stok dalam keadaan aman.";
+    }
+  }
+
+  // SETTING
+  function loadSettingForm() {
+    document.getElementById('cfg-nama').value = appData.setting.nama || '';
+    document.getElementById('cfg-alamat').value = appData.setting.alamat || '';
+    document.getElementById('cfg-wa').value = appData.setting.wa || '';
+    document.getElementById('cfg-footer').value = appData.setting.footer || '';
+    document.getElementById('cfg-minstok').value = appData.setting.minStok || 5;
+  }
+
+  function simpanSetting() {
+    appData.setting.nama = document.getElementById('cfg-nama').value;
+    appData.setting.alamat = document.getElementById('cfg-alamat').value;
+    appData.setting.wa = document.getElementById('cfg-wa').value;
+    appData.setting.footer = document.getElementById('cfg-footer').value;
+    appData.setting.minStok = parseInt(document.getElementById('cfg-minstok').value) || 5;
 
     saveLocal();
     alert("Pengaturan berhasil disimpan!");
   }
 
-  function resetTransaksi() {
-    if(confirm("Yakin ingin mengosongkan riwayat transaksi?")) {
-      appData.transaksi = [];
-      saveLocal(); updateBeranda();
-      alert("Riwayat transaksi dibersihkan!");
-    }
-  }
-
-  function resetTotalAplikasi() {
-    if(confirm("PERINGATAN! Ini akan menghapus seluruh produk, transaksi, dan data kasbon. Lanjutkan?")) {
-      localStorage.removeItem("KASIR_WARUNG_DATA");
+  function resetDataAplikasi() {
+    if (confirm("PERINGATAN: Semua data produk, transaksi, dan kasbon akan dihapus permanen! Lanjutkan?")) {
+      localStorage.removeItem('warung_pos_data');
       location.reload();
     }
   }
 
+  // BACKUP & RESTORE JSON
   function exportJSON() {
-    const dataStr = JSON.stringify(appData, null, 2);
-    downloadBlob(dataStr, `Backup_KasirWarung_${Date.now()}.json`, "application/json");
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData));
+    const dlAnchorElem = document.createElement('a');
+    dlAnchorElem.setAttribute("href", dataStr);
+    dlAnchorElem.setAttribute("download", `backup_kasir_${Date.now()}.json`);
+    dlAnchorElem.click();
   }
 
   function importJSON(event) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      try {
-        const parsed = JSON.parse(e.target.result);
-        if(parsed.config && parsed.produk) {
-          appData = parsed;
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          appData = JSON.parse(e.target.result);
           saveLocal();
           location.reload();
-        } else { alert("Format JSON tidak sesuai!"); }
-      } catch(err) { alert("Gagal membaca file JSON!"); }
-    };
-    reader.readAsText(event.target.files[0]);
+        } catch (err) {
+          alert("File JSON tidak valid!");
+        }
+      };
+      reader.readAsText(file);
+    }
   }
 
-  function downloadBlob(content, filename, contentType) {
-    const blob = new Blob([content], { type: contentType });
-    const url = URL.createObjectURL(blob);
+  // CSV EXPORT / IMPORT
+  function downloadTemplateProdukCSV() {
+    const csvContent = "data:text/csv;charset=utf-8,Barcode,Nama,Kategori,Harga,HPP,Stok\n89912345,Rokok SP,Rokok,26000,24000,10";
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "template_produk.csv");
+    document.body.appendChild(link);
+    link.click();
+  }
+
+  function exportProdukCSV() {
+    let csv = "Barcode,Nama,Kategori,Harga,HPP,Stok\n";
+    appData.produk.forEach(p => {
+      csv += `"${p.barcode||''}","${p.nama}","${p.kategori}",${p.harga},${p.hpp||0},${p.stok!==null?p.stok:''}\n`;
+    });
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
+    a.download = `daftar_produk_${Date.now()}.csv`;
     a.click();
-    document.body.removeChild(a);
   }
-      // ==========================================
-      // TEMPELKAN KODE REALTIME NOTIFIKASI DI SINI
-      // ==========================================
-      const orderChannel = supabase
-        .channel('realtime-orders')
-        .on(
-          'postgres_changes',
-          { event: 'INSERT', schema: 'public', table: 'orders' },
-          (payload) => {
-            const pesananBaru = payload.new;
-            playNotificationSound();
-            alert(`🔔 PESANAN BARU MASUK!\nMeja: ${pesananBaru.table_number}\nTotal: Rp ${pesananBaru.total_amount.toLocaleString('id-ID')}`);
-            
-            // Panggil fungsi tampilkan pesanan yang ada di aplikasi kamu
-            if (typeof renderOrders === 'function') {
-              renderOrders();
-            }
+
+  function importProdukCSV(event) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const lines = e.target.result.split('\n');
+        for (let i = 1; i < lines.length; i++) {
+          if (!lines[i].trim()) continue;
+          const cols = lines[i].split(',').map(c => c.replace(/"/g, '').trim());
+          if (cols.length >= 4) {
+            appData.produk.push({
+              id: Date.now() + i,
+              barcode: cols[0],
+              nama: cols[1],
+              kategori: cols[2] || "Lainnya",
+              harga: parseFloat(cols[3]) || 0,
+              hpp: parseFloat(cols[4]) || 0,
+              stok: cols[5] !== '' ? parseInt(cols[5]) : null
+            });
           }
-        )
-        .subscribe();
-
-      function playNotificationSound() {
-        const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
-        audio.play().catch(e => console.log("Akses audio butuh interaksi pengguna dulu:", e));
-      }
-  // OVERRIDE OTOMATIS FITUR MENU QR
-function renderMenuQR() {
-  const container = document.querySelector('#page-qr .card') || document.getElementById('qr-menu-list') || document.getElementById('katalog-menu-list');
-  if (!container) return;
-
-  const produkList = (window.appData && window.appData.produk) ? window.appData.produk : [];
-
-  if (produkList.length === 0) {
-    container.innerHTML = `
-      <div style="text-align:center; padding:20px; color:#666;">
-        <h4 style="margin-bottom:8px;">Belum Ada Menu</h4>
-        <p style="font-size:12px;">Silakan isi produk terlebih dahulu di menu <b>Kelola Produk</b>.</p>
-      </div>`;
-    return;
-  }
-
-  let html = `<h3 style="text-align:center; color:#0d9488; margin-bottom:15px;">Daftar Menu Warung</h3>`;
-  html += produkList.map(p => {
-    const foto = p.foto || p.image || '';
-    const imgHtml = foto 
-      ? `<img src="${foto}" style="width:55px; height:55px; object-fit:cover; border-radius:8px; margin-right:12px;">` 
-      : `<div style="width:55px; height:55px; background:#f1f5f9; border-radius:8px; margin-right:12px; display:flex; align-items:center; justify-content:center; font-size:10px; color:#94a3b8;">No Image</div>`;
-
-    return `
-      <div style="display:flex; align-items:center; padding:10px; margin-bottom:10px; background:#fff; border-radius:8px; border:1px solid #e2e8f0; box-shadow:0 1px 2px rgba(0,0,0,0.05);">
-        ${imgHtml}
-        <div style="flex:1;">
-          <div style="font-weight:bold; font-size:14px; color:#1e293b;">${p.nama}</div>
-          <div style="font-size:11px; color:#64748b;">Kategori: ${p.kategori || '-'}</div>
-          <div style="font-weight:bold; color:#0d9488; font-size:13px; margin-top:3px;">Rp ${Number(p.harga || 0).toLocaleString('id-ID')}</div>
-        </div>
-      </div>
-    `;
-  }).join('');
-
-  container.innerHTML = html;
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-  setTimeout(renderMenuQR, 1000);
-});
-// PERBAIKAN OTOMATIS TOMBOL ROKOK BATANGAN DI KASIR
-function perbaikiTombolRokok() {
-  if (!window.appData || !window.appData.produk) return;
-
-  let adaPerubahan = false;
-  window.appData.produk.forEach(p => {
-    const namaLower = (p.nama || '').toLowerCase();
-
-    if (namaLower.includes('s.p') || namaLower.includes('evo') || (p.hargaBatang && Number(p.hargaBatang) > 0)) {
-      p.isRokok = true;
-      if (!p.hargaBatang || Number(p.hargaBatang) === 0) p.hargaBatang = 2000;
-      if (!p.isiBatang) p.isiBatang = 16;
-      if (p.stokBatang === undefined || p.stokBatang === null) p.stokBatang = 16;
-      adaPerubahan = true;
+        }
+        saveLocal();
+        renderMasterProduk();
+        renderKasirProduk();
+        alert("Import produk CSV berhasil!");
+      };
+      reader.readAsText(file);
     }
-  });
-
-  if (adaPerubahan && typeof saveLocal === 'function') {
-    saveLocal();
   }
 
-  if (typeof renderKasir === 'function') renderKasir();
-  if (typeof renderKatalog === 'function') renderKatalog();
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-  setTimeout(perbaikiTombolRokok, 500);
-  setTimeout(perbaikiTombolRokok, 1500);
-});
-
-  
-  
-    </script>
-  </body>
+  function exportLaporanCSV() {
+    let csv = "ID,Waktu,Metode,Total,Pelanggan\n";
+    appData.transaksi.forEach(t => {
+      csv += `"${t.id}","${t.waktu}","${t.metode}",${t.total},"${t.pelanggan||''}"\n`;
+    });
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `laporan_transaksi_${Date.now()}.csv`;
+    a.click();
+  }
+</script>
+</body>
 </html>
