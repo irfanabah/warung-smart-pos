@@ -159,7 +159,7 @@
 
         <div class="input-group">
           <label>Total Tagihan (Rp)</label>
-          <input type="number" id="kasir-total" class="input-field" readonly value="0">
+          <input type="number" id="kasir-total" class="input-field" value="0">
         </div>
 
         <div class="input-group">
@@ -193,8 +193,8 @@
       <div class="card">
         <div class="title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>SEBLAK PRASMANAN (BEBAS NOMINAL)</div>
         <div class="input-group">
-          <label>Nominal Harga / Paket Custom (Rp)</label>
-          <input type="number" id="seblak-harga" class="input-field" placeholder="Masukkan nominal (Misal: 8000)">
+          <label>Total Tagihan / Nominal Harga (Rp)</label>
+          <input type="number" id="seblak-harga" class="input-field" placeholder="Ketik nominal tagihan seblak (misal: 15000)">
         </div>
         <div class="input-group">
           <label>Catatan Topping / Isian (Opsional)</label>
@@ -389,7 +389,7 @@
     transaksi: [],
     kasbon: [],
     setting: {
-      nama: "Warung Smart POS",
+      nama: "Warung Bismillah",
       alamat: "Jl. Raya Cisarua Bogor",
       wa: "08123456789",
       footer: "Terima kasih telah berbelanja!",
@@ -678,7 +678,6 @@
       const row = document.createElement('div');
       row.className = 'list-row';
 
-      // Pengecekan mutlak apakah rokok eceran
       const isEceran = Boolean(p.isRokok) || (p.hargaBatang && Number(p.hargaBatang) > 0);
 
       let actionBtn = '';
@@ -751,7 +750,7 @@
       id: `seblak_${Date.now()}`,
       nama: `Seblak Prasmanan ${cat ? `(${cat})` : ''}`,
       harga: hrg,
-      hpp: hrg * 0.6, // Estimasi HPP Modal
+      hpp: hrg * 0.6,
       qty: 1,
       tipe: 'seblak'
     });
@@ -809,7 +808,7 @@
     select.innerHTML = `
       <option value="Tunai">Tunai</option>
       <option value="QRIS">QRIS / Transfer</option>
-      <option value="Kasbon">Kasbon / Piutang</option>
+      <option value="Kasbon">Kasbon / Piutang Full</option>
     `;
   }
 
@@ -828,31 +827,48 @@
     const total = parseFloat(document.getElementById('kasir-total').value) || 0;
     const bayar = parseFloat(document.getElementById('kasir-bayar').value) || 0;
     const kembalian = bayar - total;
-    document.getElementById('text-kembalian').innerText = `Kembalian: Rp ${kembalian >= 0 ? kembalian.toLocaleString('id-ID') : 0}`;
+
+    if (kembalian < 0) {
+      document.getElementById('text-kembalian').innerText = `Kurang: Rp ${Math.abs(kembalian).toLocaleString('id-ID')} (Akan ditawarkan Kasbon)`;
+      document.getElementById('text-kembalian').style.color = '#dc2626';
+    } else {
+      document.getElementById('text-kembalian').innerText = `Kembalian: Rp ${kembalian.toLocaleString('id-ID')}`;
+      document.getElementById('text-kembalian').style.color = '#333';
+    }
   }
 
+  // PROSES BAYAR TERMASUK FITUR FITUR UANG KURANG JADI KASBON AUTOMATIS
   function prosesBayar() {
     const total = parseFloat(document.getElementById('kasir-total').value) || 0;
     const metode = document.getElementById('kasir-metode').value;
-    const bayar = parseFloat(document.getElementById('kasir-bayar').value) || 0;
+    let bayar = parseFloat(document.getElementById('kasir-bayar').value) || 0;
 
     if (appData.keranjang.length === 0) {
       alert("Keranjang belanja masih kosong!");
       return;
     }
 
-    if (metode === 'Tunai' && bayar < total) {
-      alert("Uang pembayaran kurang!");
-      return;
-    }
-
+    let sisaKurang = 0;
     let namaPelanggan = "";
-    if (metode === 'Kasbon') {
+
+    if (metode === 'Tunai' && bayar < total) {
+      sisaKurang = total - bayar;
+      const mauKasbon = confirm(`Uang pembayaran kurang Rp ${sisaKurang.toLocaleString('id-ID')}.\n\nApakah sisa kekurangan ingin dimasukkan ke Catatan Kasbon?`);
+      if (!mauKasbon) return;
+
+      namaPelanggan = prompt("Masukkan Nama Pelanggan Kasbon:");
+      if (!namaPelanggan) {
+        alert("Nama pelanggan wajib diisi untuk mencatat kasbon!");
+        return;
+      }
+    } else if (metode === 'Kasbon') {
       namaPelanggan = prompt("Masukkan Nama Pelanggan Kasbon:");
       if (!namaPelanggan) {
         alert("Nama pelanggan wajib diisi untuk transaksi kasbon!");
         return;
       }
+      sisaKurang = total;
+      bayar = 0;
     }
 
     // Potong Stok
@@ -873,18 +889,19 @@
       item: [...appData.keranjang],
       total,
       metode,
-      bayar: metode === 'Tunai' ? bayar : total,
-      kembali: metode === 'Tunai' ? (bayar - total) : 0,
+      bayar: bayar,
+      kembali: (metode === 'Tunai' && bayar >= total) ? (bayar - total) : 0,
       pelanggan: namaPelanggan
     };
 
     appData.transaksi.push(trx);
 
-    if (metode === 'Kasbon') {
+    // Otomatis masukkan kasbon jika ada sisa kurang
+    if (sisaKurang > 0) {
       appData.kasbon.push({
         id: Date.now(),
         nama: namaPelanggan,
-        total,
+        total: sisaKurang,
         status: 'Belum Lunas',
         waktu: trx.waktu
       });
