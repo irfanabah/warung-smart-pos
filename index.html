@@ -1124,12 +1124,15 @@
 
   // BACKUP & RESTORE JSON
   function exportJSON() {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData));
-    const dlAnchorElem = document.createElement('a');
-    dlAnchorElem.setAttribute("href", dataStr);
-    dlAnchorElem.setAttribute("download", `backup_kasir_${Date.now()}.json`);
-    dlAnchorElem.click();
-  }
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData, null, 2));
+  const dlAnchorElem = document.createElement('a');
+  dlAnchorElem.setAttribute("href", dataStr);
+  dlAnchorElem.setAttribute("download", `backup_kasir_${new Date().toISOString().slice(0, 10)}.json`);
+  document.body.appendChild(dlAnchorElem);
+  dlAnchorElem.click();
+  dlAnchorElem.remove();
+}
+
 
   function importJSON(event) {
     const file = event.target.files[0];
