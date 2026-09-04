@@ -75,6 +75,20 @@
     .badge-danger { background: #fee2e2; color: #991b1b; }
 
     .camera-preview { width: 100%; max-height: 250px; background: #000; border-radius: 8px; object-fit: cover; margin-bottom: 10px; }
+
+    /* Custom Category List Badge Styles */
+    .kat-item-badge {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 8px 12px;
+      border-radius: 8px;
+      margin-bottom: 6px;
+      font-size: 13px;
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
@@ -248,10 +262,9 @@
       </div>
 
       <div class="card">
-        <div class="title">Kategori Produk</div>
-        <div style="display:flex; gap:6px; margin-bottom:8px;">
-          <input type="text" id="kat-nama" class="form-control" placeholder="Kategori baru">
-          <button class="btn btn-secondary" onclick="tambahKategori()">Tambah</button>
+        <div class="title">
+          <span>Kategori Produk</span>
+          <button class="btn btn-sm btn-primary" onclick="bukaModalKelolaKategori()">⚙️ Kelola Kategori</button>
         </div>
         <div id="kat-chip-list"></div>
       </div>
@@ -299,6 +312,26 @@
     </button>
   </nav>
 
+</div>
+
+<div id="modal-kelola-kategori" class="modal">
+  <div class="modal-content">
+    <div class="title">
+      <span>🏷️ Kelola Kategori Produk</span>
+      <button class="btn btn-sm btn-secondary" onclick="tutupModalKelolaKategori()">Tutup</button>
+    </div>
+    
+    <div class="card" style="background:#f8fafc; border:1px dashed #0d9488; margin-bottom:12px;">
+      <div style="font-weight:700; font-size:12px; color:#0d9488; margin-bottom:6px;">Tambah Kategori Baru</div>
+      <div style="display:flex; gap:6px;">
+        <input type="text" id="kat-modal-nama" class="form-control" placeholder="Nama Kategori (misal: Snack)">
+        <button class="btn btn-primary" onclick="tambahKategoriModal()">Tambah</button>
+      </div>
+    </div>
+
+    <div style="font-weight:700; font-size:13px; margin-bottom:8px; color:#1e293b;">Daftar Kategori Saat Ini:</div>
+    <div id="kat-modal-list"></div>
+  </div>
 </div>
 
 <div id="modal-visual-scan" class="modal">
@@ -662,22 +695,92 @@
         selectKat.appendChild(opt);
 
         const chip = document.createElement('span');
-        chip.style.cssText = "background:#e2e8f0; font-size:11px; padding:3px 8px; border-radius:12px; margin-right:4px;";
+        chip.style.cssText = "background:#e2e8f0; font-size:11px; padding:4px 10px; border-radius:12px; margin-right:4px; margin-bottom:4px; display:inline-block; font-weight:600;";
         chip.innerText = `${icon} ${kat}`;
         chipList.appendChild(chip);
       }
     });
   }
 
-  function tambahKategori() {
-    const input = document.getElementById('kat-nama');
+  // LOGIKA MODAL CUSTOM KATEGORI
+  function bukaModalKelolaKategori() {
+    document.getElementById('modal-kelola-kategori').classList.add('active');
+    renderKategoriModalList();
+  }
+
+  function tutupModalKelolaKategori() {
+    document.getElementById('modal-kelola-kategori').classList.remove('active');
+  }
+
+  function renderKategoriModalList() {
+    const container = document.getElementById('kat-modal-list');
+    container.innerHTML = '';
+
+    appData.kategori.forEach((kat) => {
+      if (kat === 'Semua') return;
+      const icon = getCategoryIcon(kat);
+      const isDefault = ['Makanan', 'Minuman', 'Lainnya', 'Rokok'].includes(kat);
+
+      const div = document.createElement('div');
+      div.className = 'kat-item-badge';
+      div.innerHTML = `
+        <span>${icon} ${kat}</span>
+        <div style="display:flex; gap:4px;">
+          <button class="btn btn-sm btn-secondary" onclick="editKategoriModal('${kat}')">Edit</button>
+          ${!isDefault ? `<button class="btn btn-sm btn-danger" onclick="hapusKategoriModal('${kat}')">Hapus</button>` : ''}
+        </div>
+      `;
+      container.appendChild(div);
+    });
+  }
+
+  function tambahKategoriModal() {
+    const input = document.getElementById('kat-modal-nama');
     const val = input.value.trim();
     if (val && !appData.kategori.includes(val)) {
       appData.kategori.push(val);
       input.value = '';
       saveLocal();
       renderKategori();
-      showToast("Kategori ditambahkan");
+      renderKategoriModalList();
+      showToast("Kategori berhasil ditambahkan");
+    } else if (appData.kategori.includes(val)) {
+      showToast("Kategori sudah ada!", "error");
+    }
+  }
+
+  function editKategoriModal(oldKat) {
+    const newName = prompt("Ubah nama kategori:", oldKat);
+    if (newName && newName.trim() !== "" && newName.trim() !== oldKat) {
+      const cleanName = newName.trim();
+      const idx = appData.kategori.indexOf(oldKat);
+      if (idx !== -1) {
+        appData.kategori[idx] = cleanName;
+        appData.produk.forEach(p => {
+          if (p.kategori === oldKat) p.kategori = cleanName;
+        });
+        saveLocal();
+        renderKategori();
+        renderKategoriModalList();
+        renderMasterProduk();
+        renderKasirProduk();
+        showToast("Kategori diperbarui");
+      }
+    }
+  }
+
+  function hapusKategoriModal(kat) {
+    if (confirm(`Yakin ingin menghapus kategori "${kat}"?`)) {
+      appData.kategori = appData.kategori.filter(k => k !== kat);
+      appData.produk.forEach(p => {
+        if (p.kategori === kat) p.kategori = 'Lainnya';
+      });
+      saveLocal();
+      renderKategori();
+      renderKategoriModalList();
+      renderMasterProduk();
+      renderKasirProduk();
+      showToast("Kategori dihapus");
     }
   }
 
