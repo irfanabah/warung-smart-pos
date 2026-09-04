@@ -131,7 +131,7 @@
       const card = document.createElement('div');
       card.className = 'menu-card';
       card.innerHTML = `
-        <div class="menu-info">
+        <div class="menu-info" onclick="updateQty(${item.id}, 1)" style="cursor: pointer; flex-grow: 1;">
           <img src="${item.img || 'https://via.placeholder.com/64?text=Menu'}" class="menu-img">
           <div class="menu-detail">
             <h3>${item.nama}</h3>
@@ -139,7 +139,7 @@
             <div class="menu-price">Rp ${item.harga.toLocaleString('id-ID')}</div>
           </div>
         </div>
-        <div class="qty-control">
+        <div class="qty-control" onclick="event.stopPropagation()">
           <button class="btn-qty" onclick="updateQty(${item.id}, -1)">-</button>
           <span class="qty-num">${qty}</span>
           <button class="btn-qty" onclick="updateQty(${item.id}, 1)">+</button>
