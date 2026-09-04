@@ -73,7 +73,7 @@
     .receipt-header { text-align: center; margin-bottom: 10px; }
     .receipt-row { display: flex; justify-content: space-between; margin-bottom: 4px; }
 
-    /* Toast */
+    /* Toast Notification */
     #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 3000; width: 90%; max-width: 400px; pointer-events: none; }
     .toast { background: #1e293b; color: #fff; padding: 10px 16px; border-radius: 8px; font-size: 13px; margin-bottom: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 8px; animation: fadeIn 0.3s; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(-10%); } to { opacity: 1; transform: translateY(0); } }
@@ -217,23 +217,7 @@
       <div class="grid-2" id="kasir-produk-list"></div>
     </div>
 
-    <!-- PAGE 4: SEBLAK PRASMANAN -->
-    <div id="page-seblak" class="page">
-      <div class="title">Seblak Prasmanan</div>
-      <div class="card">
-        <div class="form-group">
-          <label>Harga / Nominal Bebas (Rp)</label>
-          <input type="number" id="seblak-harga" class="form-control" placeholder="Contoh: 15000">
-        </div>
-        <div class="form-group">
-          <label>Catatan Topping / Kerupuk</label>
-          <textarea id="seblak-catatan" class="form-control" rows="3" placeholder="Contoh: Kerupuk mawar, sosis, bakso, level 3"></textarea>
-        </div>
-        <button class="btn btn-primary btn-full" onclick="tambahSeblakKeCart()">Masukkan Ke Keranjang</button>
-      </div>
-    </div>
-
-    <!-- PAGE 5: KASBON / PIUTANG -->
+    <!-- PAGE 4: KASBON / PIUTANG -->
     <div id="page-kasbon" class="page">
       <div class="title">Catatan Kasbon / Piutang</div>
       <div class="card">
@@ -241,7 +225,7 @@
       </div>
     </div>
 
-    <!-- PAGE 6: SETTING -->
+    <!-- PAGE 5: SETTING -->
     <div id="page-setting" class="page">
       <div class="title">Pengaturan Toko</div>
       <div class="card">
@@ -432,7 +416,6 @@
   let editId = null;
   let activeKatFilter = "Semua";
   let tempFotoProduct = "";
-  let tempCustomFoto = "";
   let html5QrcodeScanner = null;
   let scanModeTarget = "kasir";
   let pendingKasbonTrx = null;
@@ -788,24 +771,6 @@
 
   function tutupModalKeranjang() {
     document.getElementById('modal-keranjang').classList.remove('active');
-  }
-
-  function tambahSeblakKeCart() {
-    const hrg = parseFloat(document.getElementById('seblak-harga').value) || 0;
-    const cat = document.getElementById('seblak-catatan').value.trim();
-
-    if (hrg <= 0) { showToast("Masukkan nominal harga seblak!", "error"); return; }
-
-    appData.keranjang.push({
-      cartKey: `seblak_${Date.now()}`, id: `seblak_${Date.now()}`,
-      nama: `Seblak Prasmanan ${cat ? `(${cat})` : ''}`,
-      harga: hrg, hpp: hrg * 0.6, qty: 1, tipe: 'seblak'
-    });
-
-    document.getElementById('seblak-harga').value = '';
-    document.getElementById('seblak-catatan').value = '';
-    switchTab('Kasir');
-    showToast("Seblak masuk keranjang");
   }
 
   function renderCart() {
