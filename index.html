@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kasir Warung Super</title>
-  com/html5-qrcode" type="text/javascript"></script>
+  <!-- Library QR Code / Barcode Scanner -->
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
   body { background-color: #f4f6f8; color: #333; font-size: 16px; padding-bottom: 80px; }
@@ -37,13 +38,59 @@
   .icon-wrap svg { width: 22px; height: 22px; }
   .menu-card span { font-size: 15px; font-weight: 700; color: #334155; }
 
-  /* Form & Input Fields (Ukuran Font Besar) */
+  /* Form & Input Fields */
   input, select, button { width: 100%; padding: 14px; font-size: 16px; border: 1.5px solid #cbd5e1; border-radius: 10px; margin-bottom: 10px; outline: none; }
-  input:focus { border-color: #0f766e; }
+  input:focus, select:focus { border-color: #0f766e; }
   button { background: #0f766e; color: white; font-weight: 700; border: none; cursor: pointer; }
   button:active { opacity: 0.9; }
 
-  /* Fixing Navigasi Bawah (Bottom Bar Kembali Kesamping) */
+  /* Grid Tombol & Input UI */
+  .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .input-group { margin-bottom: 8px; }
+  .input-group label { font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 4px; display: block; }
+  .search-barcode-box { display: flex; gap: 8px; margin-bottom: 10px; }
+
+  /* Tombol Khusus & Varian */
+  .btn-primary { background: #0f766e; color: #fff; }
+  .btn-secondary { background: #e2e8f0; color: #334155; }
+  .btn-warning { background: #d97706; color: #fff; }
+  .btn-danger { background: #ef4444; color: #fff; }
+  .btn-excel { background: #16a34a; color: #fff; }
+  .btn-scan { background: #0284c7; color: #fff; width: auto; padding: 0 16px; }
+  .btn-wa { background: #25d366; color: #fff; }
+  .btn-sm { padding: 6px 10px; font-size: 12px; border-radius: 6px; width: auto; margin-bottom: 0; }
+  .btn-outline-primary { background: transparent; border: 1px solid #0f766e; color: #0f766e; }
+  .btn-outline-secondary { background: transparent; border: 1px solid #64748b; color: #64748b; }
+  
+  .quick-cash { display: flex; gap: 6px; margin-top: 6px; }
+  .btn-cash { background: #f1f5f9; border: 1px solid #cbd5e1; color: #334155; padding: 8px 4px; font-size: 12px; margin-bottom: 0; }
+
+  /* Filter & List Items */
+  .filter-scroll { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 10px; }
+  .filter-btn { width: auto; padding: 6px 14px; font-size: 13px; border-radius: 20px; background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; white-space: nowrap; margin-bottom: 0; }
+  .filter-btn.active { background: #0f766e; color: #fff; border-color: #0f766e; }
+
+  .item-list { display: flex; flex-direction: column; gap: 8px; }
+  .list-row { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; }
+  .item-img-thumb { width: 40px; height: 40px; object-fit: cover; border-radius: 6px; margin-right: 10px; }
+  .img-preview { display: none; width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 1px solid #cbd5e1; }
+
+  /* Badges */
+  .badge-success { background: #dcfce7; color: #15803d; font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+  .badge-warning { background: #fef3c7; color: #b45309; font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+  .badge-danger { background: #fee2e2; color: #b91c1c; font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+
+  /* Modal Popup */
+  .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; padding: 16px; }
+  .modal.active { display: flex; }
+  .modal-body { background: #fff; width: 100%; max-width: 400px; border-radius: 12px; padding: 16px; max-height: 90vh; overflow-y: auto; }
+
+  /* Struk Receipt */
+  .receipt { font-family: monospace; font-size: 12px; background: #fff; padding: 10px; border: 1px solid #ddd; }
+  .receipt-header { text-align: center; margin-bottom: 8px; }
+  .receipt-row { display: flex; justify-content: space-between; margin-bottom: 2px; }
+
+  /* Navigasi Bawah */
   .bottom-nav {
     position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
     width: 100%; max-width: 480px; background: #0f766e;
@@ -53,6 +100,7 @@
   .nav-item {
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     color: rgba(255,255,255,0.7); font-size: 12px; font-weight: 600; text-decoration: none; flex: 1; cursor: pointer;
+    background: none; border: none; padding: 0; margin-bottom: 0;
   }
   .nav-item.active { color: #ffffff; font-weight: 700; }
   .nav-item svg { width: 22px; height: 22px; fill: currentColor; margin-bottom: 3px; }
@@ -147,7 +195,7 @@
 
         <div class="input-group">
           <label>Total Tagihan (Rp)</label>
-          <input type="number" id="kasir-total" class="input-field" value="0">
+          <input type="number" id="kasir-total" class="input-field" value="0" readonly>
         </div>
 
         <div class="input-group">
@@ -198,7 +246,7 @@
         <div class="title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>KELOLA KATEGORI</div>
         <div style="display:flex; gap:6px; margin-bottom:8px;">
           <input type="text" id="kat-nama" class="input-field" placeholder="Kategori Baru (misal: Minuman)">
-          <button class="btn btn-primary" onclick="tambahKategori()">Tambah</button>
+          <button class="btn btn-primary" style="width:auto; white-space:nowrap;" onclick="tambahKategori()">Tambah</button>
         </div>
         <div id="kat-chip-list" style="display:flex; flex-wrap:wrap; gap:4px;"></div>
       </div>
@@ -258,7 +306,7 @@
       </div>
     </div>
 
-    <!-- 5. CATATAN KASBON DENGAN PROSESS TAGIH WA & CICILAN -->
+    <!-- 5. CATATAN KASBON -->
     <div id="page-kasbon" class="page">
       <div class="card">
         <div class="title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>DAFTAR KASBON / PIUTANG</div>
@@ -426,6 +474,27 @@
     renderKasirPayUI();
   });
 
+  function showToast(pesan, tipe = 'success') {
+    let container = document.getElementById('toast-container');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'toast-container';
+      document.body.appendChild(container);
+    }
+    
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    
+    const icon = tipe === 'success' ? '✅' : tipe === 'error' ? '❌' : 'ℹ️';
+    toast.innerHTML = `<span>${icon}</span><span>${pesan}</span>`;
+    
+    container.appendChild(toast);
+
+    setTimeout(() => {
+      toast.remove();
+    }, 3000);
+  }
+
   function saveLocal() {
     localStorage.setItem('warung_pos_data', JSON.stringify(appData));
   }
@@ -433,7 +502,11 @@
   function loadLocal() {
     const data = localStorage.getItem('warung_pos_data');
     if (data) {
-      appData = JSON.parse(data);
+      try {
+        appData = JSON.parse(data);
+      } catch(e) {
+        console.error("Gagal parse localStorage:", e);
+      }
     }
   }
 
@@ -512,6 +585,7 @@
       input.value = '';
       saveLocal();
       renderKategori();
+      showToast("Kategori ditambahkan");
     }
   }
 
@@ -542,7 +616,7 @@
     const stokBt = document.getElementById('p-stok-btg').value;
 
     if (!nama || harga <= 0) {
-      alert("Nama produk dan harga jual wajib diisi!");
+      showToast("Nama produk dan harga jual wajib diisi!", "error");
       return;
     }
 
@@ -567,7 +641,7 @@
     renderMasterProduk();
     renderKasirProduk();
     resetFormProduk();
-    alert("Produk berhasil disimpan!");
+    showToast("Produk berhasil disimpan!");
   }
 
   function resetFormProduk() {
@@ -633,6 +707,7 @@
     if (confirm("Yakin ingin menghapus produk ini?")) {
       appData.produk = appData.produk.filter(p => p.id !== id);
       saveLocal(); renderMasterProduk(); renderKasirProduk();
+      showToast("Produk berhasil dihapus");
     }
   }
 
@@ -694,13 +769,14 @@
       });
     }
     renderCart();
+    showToast(`${labelNama} masuk keranjang`);
   }
 
   function tambahSeblakKeCart() {
     const hrg = parseFloat(document.getElementById('seblak-harga').value) || 0;
     const cat = document.getElementById('seblak-catatan').value.trim();
 
-    if (hrg <= 0) { alert("Masukkan nominal harga seblak!"); return; }
+    if (hrg <= 0) { showToast("Masukkan nominal harga seblak!", "error"); return; }
 
     appData.keranjang.push({
       cartKey: `seblak_${Date.now()}`, id: `seblak_${Date.now()}`,
@@ -711,6 +787,7 @@
     document.getElementById('seblak-harga').value = '';
     document.getElementById('seblak-catatan').value = '';
     switchTab('Kasir');
+    showToast("Seblak masuk keranjang");
   }
 
   function renderCart() {
@@ -784,14 +861,13 @@
     }
   }
 
-  // LOGIKA TRANSAKSI DENGAN MODAL DETAIL KASBON JATUH TEMPO & NO WA
   function prosesBayar() {
     const total = parseFloat(document.getElementById('kasir-total').value) || 0;
     const metode = document.getElementById('kasir-metode').value;
     let bayar = parseFloat(document.getElementById('kasir-bayar').value) || 0;
 
     if (appData.keranjang.length === 0) {
-      alert("Keranjang belanja masih kosong!");
+      showToast("Keranjang belanja masih kosong!", "error");
       return;
     }
 
@@ -833,7 +909,7 @@
     const tempo = document.getElementById('kb-tempo').value;
 
     if (!nama) {
-      alert("Nama Pelanggan wajib diisi!");
+      showToast("Nama Pelanggan wajib diisi!", "error");
       return;
     }
 
@@ -859,7 +935,6 @@
   function selesaikanTransaksi(trx, pelanggan) {
     trx.pelanggan = pelanggan;
 
-    // Potong Stok
     trx.item.forEach(item => {
       const p = appData.produk.find(x => x.id === item.id);
       if (p) {
@@ -877,6 +952,7 @@
     renderCart();
     renderKasirProduk();
     pendingKasbonTrx = null;
+    showToast("Transaksi berhasil!");
   }
 
   function cetakStruk(trx) {
@@ -919,7 +995,6 @@
     document.getElementById('modal-struk').classList.remove('active');
   }
 
-  // PENGELOLAAN KASBON LENGKAP: FITUR CICILAN & TAGIH VIA WHATSAPP
   function renderKasbon() {
     const list = document.getElementById('kasbon-list');
     list.innerHTML = '';
@@ -967,10 +1042,10 @@
       if (k.sisa <= 0) {
         k.sisa = 0;
         k.status = 'Lunas';
-        alert(`Kasbon ${k.nama} telah LUNAS!`);
+        showToast(`Kasbon ${k.nama} LUNAS!`);
       } else {
         k.status = 'Belum Lunas';
-        alert(`Pembayaran dicatat. Sisa kasbon ${k.nama}: Rp ${k.sisa.toLocaleString('id-ID')}`);
+        showToast(`Sisa kasbon ${k.nama}: Rp ${k.sisa.toLocaleString('id-ID')}`);
       }
 
       saveLocal();
@@ -999,10 +1074,10 @@
       appData.kasbon.splice(index, 1);
       saveLocal();
       renderKasbon();
+      showToast("Kasbon dihapus");
     }
   }
 
-  // MODAL CUSTOM FOTO ITEM
   function bukaModalFotoCustomItem() { document.getElementById('modal-foto-custom').classList.add('active'); }
   function tutupModalFotoCustomItem() {
     document.getElementById('modal-foto-custom').classList.remove('active');
@@ -1027,7 +1102,7 @@
   function simpanCustomFotoKeCart() {
     const nama = document.getElementById('custom-nama').value.trim() || 'Barang Foto Cepat';
     const harga = parseFloat(document.getElementById('custom-harga').value) || 0;
-    if (harga <= 0) { alert("Masukkan harga jual!"); return; }
+    if (harga <= 0) { showToast("Masukkan harga jual!", "error"); return; }
 
     appData.keranjang.push({
       cartKey: `custom_${Date.now()}`, id: `custom_${Date.now()}`,
@@ -1035,9 +1110,9 @@
     });
     tutupModalFotoCustomItem();
     renderCart();
+    showToast("Item ditambahkan ke keranjang");
   }
 
-  // SCANNER KAMERA
   function bukaModalScanner(target) {
     scanModeTarget = target;
     document.getElementById('modal-scanner').classList.add('active');
@@ -1059,7 +1134,6 @@
     document.getElementById('modal-scanner').classList.remove('active');
   }
 
-  // DASHBOARD & LAPORAN
   function renderDashboard() {
     const today = new Date().toLocaleDateString('id-ID');
     const trxToday = appData.transaksi.filter(t => t.waktu.includes(today));
@@ -1086,7 +1160,6 @@
     }
   }
 
-  // SETTING
   function loadSettingForm() {
     document.getElementById('cfg-nama').value = appData.setting.nama || '';
     document.getElementById('cfg-alamat').value = appData.setting.alamat || '';
@@ -1102,7 +1175,7 @@
     appData.setting.footer = document.getElementById('cfg-footer').value;
     appData.setting.minStok = parseInt(document.getElementById('cfg-minstok').value) || 5;
     saveLocal();
-    alert("Pengaturan berhasil disimpan!");
+    showToast("Pengaturan disimpan!");
   }
 
   function resetDataAplikasi() {
@@ -1112,17 +1185,16 @@
     }
   }
 
-  // BACKUP & RESTORE JSON
   function exportJSON() {
-  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData, null, 2));
-  const dlAnchorElem = document.createElement('a');
-  dlAnchorElem.setAttribute("href", dataStr);
-  dlAnchorElem.setAttribute("download", `backup_kasir_${new Date().toISOString().slice(0, 10)}.json`);
-  document.body.appendChild(dlAnchorElem);
-  dlAnchorElem.click();
-  dlAnchorElem.remove();
-}
-
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData, null, 2));
+    const dlAnchorElem = document.createElement('a');
+    dlAnchorElem.setAttribute("href", dataStr);
+    dlAnchorElem.setAttribute("download", `backup_kasir_${new Date().toISOString().slice(0, 10)}.json`);
+    document.body.appendChild(dlAnchorElem);
+    dlAnchorElem.click();
+    dlAnchorElem.remove();
+    showToast("Backup JSON diunduh");
+  }
 
   function importJSON(event) {
     const file = event.target.files[0];
@@ -1133,13 +1205,12 @@
           appData = JSON.parse(e.target.result);
           saveLocal();
           location.reload();
-        } catch (err) { alert("File JSON tidak valid!"); }
+        } catch (err) { showToast("File JSON tidak valid!", "error"); }
       };
       reader.readAsText(file);
     }
   }
 
-  // CSV EXPORT / IMPORT
   function downloadTemplateProdukCSV() {
     const csvContent = "data:text/csv;charset=utf-8,Barcode,Nama,Kategori,Harga,HPP,Stok\n89912345,Rokok SP,Rokok,26000,24000,10";
     const encodedUri = encodeURI(csvContent);
@@ -1187,7 +1258,7 @@
         saveLocal();
         renderMasterProduk();
         renderKasirProduk();
-        alert("Import produk CSV berhasil!");
+        showToast("Import produk CSV berhasil!");
       };
       reader.readAsText(file);
     }
@@ -1205,27 +1276,6 @@
     a.download = `laporan_transaksi_${Date.now()}.csv`;
     a.click();
   }
-  // Fungsi Toast Notifikasi Baru
-function showToast(pesan, tipe = 'success') {
-  let container = document.getElementById('toast-container');
-  if (!container) {
-    container = document.createElement('div');
-    container.id = 'toast-container';
-    document.body.appendChild(container);
-  }
-  
-  const toast = document.createElement('div');
-  toast.className = 'toast';
-  
-  const icon = tipe === 'success' ? '✅' : tipe === 'error' ? '❌' : 'ℹ️';
-  toast.innerHTML = `<span>${icon}</span><span>${pesan}</span>`;
-  
-  container.appendChild(toast);
-
-  setTimeout(() => {
-    toast.remove();
-  }, 3000);
-}
 </script>
 </body>
 </html>
