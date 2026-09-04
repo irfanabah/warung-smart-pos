@@ -78,12 +78,23 @@
 
   <!-- Footer Checkout -->
   <div class="footer-checkout">
-    <input type="text" id="cust-nama" class="input-field" placeholder="Masukkan Nama Kamu..." style="margin-bottom:10px;">
-    <div class="checkout-row">
-      <span style="font-size:12px; color:#64748b;">Total Pesanan:</span>
-      <span class="total-price" id="text-total">Rp 0</span>
-    </div>
-    <button class="btn-submit" onclick="kirimPesanan()">Kirim Pesanan (WA)</button>
+  <input type="text" id="cust-nama" class="input-field" placeholder="Masukkan Nama Kamu..." style="margin-bottom:10px;">
+  
+  <div class="checkout-row">
+    <span style="font-size:12px; color:#64748b;">Total Pesanan:</span>
+    <span class="total-price" id="text-total">Rp 0</span>
+  </div>
+
+  <div style="display: flex; gap: 8px;">
+    <!-- Tombol 1: Cetak Printer Bluetooth -->
+    <button class="btn-submit" onclick="cetakStrukBluetooth()" style="background: #0284c7; flex: 1; font-size: 12px; padding: 10px;">
+      🖨️ Cetak Printer
+    </button>
+    
+    <!-- Tombol 2: Kirim ke WhatsApp -->
+    <button class="btn-submit" onclick="kirimPesanan()" style="background: #25d366; flex: 1; font-size: 12px; padding: 10px;">
+      📲 Kirim WA
+    </button>
   </div>
 </div>
 
@@ -213,6 +224,55 @@
     // Ganti nomor WhatsApp tujuan penjual di sini (format 62)
     const noWA = "628123456789"; 
     window.open(`https://wa.me/${noWA}?text=${encodeURIComponent(ringkasan)}`, '_blank');
+  }
+  // Fungsi Cetak Langsung ke Printer Bluetooth Thermal (ESC/POS)
+async function cetakStrukBluetooth() {
+  const nama = document.getElementById('cust-nama').value.trim();
+  if (!nama) { alert("Silakan masukkan nama Anda terlebih dahulu!"); return; }
+  if (Object.keys(cart).length === 0) { alert("Keranjang belanjaan Anda masih kosong!"); return; }
+
+  if (!navigator.bluetooth) {
+    alert("Browser HP kamu belum mendukung Bluetooth! Gunakan Google Chrome di Android.");
+    return;
+  }
+
+  try {
+    const device = await navigator.bluetooth.requestDevice({
+      acceptAllDevices: true,
+      optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb', '00001101-0000-1000-8000-00805f9b34fb']
+    });
+
+    const server = await device.gatt.connect();
+    const services = await server.getPrimaryServices();
+    const service = services[0];
+    const characteristics = await service.getCharacteristics();
+    const printer = characteristics[0];
+
+    let total = 0;
+    let strukText = `   WARUNG BISMILLAH   \n`;
+    strukText += `--------------------------------\n`;
+    strukText += `${nomorMeja} | Pemesan: ${nama}\n`;
+    strukText += `--------------------------------\n`;
+
+    Object.values(cart).forEach(item => {
+      const subtotal = item.harga * item.qty;
+      total += subtotal;
+      strukText += `${item.nama}\n`;
+      strukText += `  ${item.qty} x ${item.harga.toLocaleString('id-ID')} = ${subtotal.toLocaleString('id-ID')}\n`;
+    });
+
+    strukText += `--------------------------------\n`;
+    strukText += `TOTAL    : Rp ${total.toLocaleString('id-ID')}\n`;
+    strukText += `--------------------------------\n`;
+    strukText += `   Terima Kasih!   \n\n\n`;
+
+    const encoder = new TextEncoder();
+    await printer.writeValue(encoder.encode(strukText));
+    
+    alert("✅ Struk berhasil dicetak!");
+  } catch (error) {
+    console.error(error);
+    alert("❌ Gagal terhubung ke Printer Bluetooth: " + error.message);
   }
 </script>
 </body>
