@@ -50,9 +50,9 @@
 
     .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
     .kasir-item-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; }
-    .kasir-item-img { width: 100%; height: 90px; object-fit: cover; background: #f8fafc; display: flex; align-items: center; justify-content: center; color: #cbd5e1; font-size: 24px; }
+    .kasir-item-img { width: 100%; height: 90px; object-fit: cover; background: #f8fafc; display: flex; align-items: center; justify-content: center; color: #cbd5e1; font-size: 32px; }
     .kasir-item-info { padding: 8px; }
-    .kasir-item-name { font-weight: 600; font-size: 13px; color: #1e293b; line-height: 1.2; margin-bottom: 4px; }
+    .kasir-item-name { font-weight: 600; font-size: 13px; color: #1e293b; line-height: 1.2; margin-bottom: 4px; display: flex; align-items: center; gap: 4px; }
     .kasir-item-price { font-weight: 700; color: #0d9488; font-size: 13px; }
     .kasir-item-stock { font-size: 10px; color: #94a3b8; }
 
@@ -313,7 +313,7 @@
 <div id="modal-seblak" class="modal">
   <div class="modal-content">
     <div class="title">
-      <span>🍜 Seblak Prasmanan</span>
+      <span>🥣 Seblak Prasmanan</span>
       <button class="btn btn-sm btn-secondary" onclick="tutupModalSeblak()">Tutup</button>
     </div>
     <div class="form-group">
@@ -332,15 +332,33 @@
 <div id="modal-keranjang" class="modal">
   <div class="modal-content">
     <div class="title">
-      <span>Keranjang Belanja</span>
+      <span>🛒 Keranjang Belanja</span>
       <button class="btn btn-sm btn-secondary" onclick="tutupModalKeranjang()">Tutup</button>
     </div>
     
     <div id="kasir-cart-list"></div>
 
     <div style="border-top:1px solid #e2e8f0; margin-top:12px; padding-top:12px;">
+      
+      <!-- FITUR DISKON CUSTOM -->
+      <div class="card" style="background:#f8fafc; border:1px dashed #cbd5e1; padding:10px; margin-bottom:12px;">
+        <div style="font-weight:700; font-size:12px; margin-bottom:6px; color:#475569;">🏷️ Diskon Custom (Bebas)</div>
+        <div style="display:flex; gap:6px;">
+          <select id="cart-diskon-tipe" class="form-control" style="width:80px;" onchange="hitungTotalBelanjaCart()">
+            <option value="rp">Rp</option>
+            <option value="percent">%</option>
+          </select>
+          <input type="number" id="cart-diskon-nilai" class="form-control" placeholder="Potongan diskon..." onkeyup="hitungTotalBelanjaCart()">
+        </div>
+      </div>
+
       <div class="form-group">
-        <label>Total Belanja</label>
+        <label>Subtotal Belanja</label>
+        <input type="text" id="kasir-subtotal-text" class="form-control" readonly style="font-weight:600; background:#f1f5f9;">
+      </div>
+
+      <div class="form-group">
+        <label>Total Akhir (Setelah Diskon)</label>
         <input type="number" id="kasir-total" class="form-control" readonly style="font-weight:bold; font-size:18px; color:#0d9488;">
       </div>
 
@@ -440,6 +458,24 @@
   let scanModeTarget = "kasir";
   let pendingKasbonTrx = null;
 
+  // Helper Ikon Kategori & Produk
+  function getCategoryIcon(kat) {
+    switch((kat || '').toLowerCase()) {
+      case 'makanan': return '🍲';
+      case 'minuman': return '🥤';
+      case 'rokok': return '🚬';
+      case 'seblak': return '🥣';
+      default: return '📦';
+    }
+  }
+
+  function getProductIcon(p) {
+    if (p.isRokok || (p.kategori || '').toLowerCase() === 'rokok') return '🚬';
+    if ((p.kategori || '').toLowerCase() === 'minuman') return '🥤';
+    if ((p.kategori || '').toLowerCase() === 'makanan') return '🍲';
+    return '📦';
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     loadLocal();
     perbaikiTombolRokok();
@@ -521,7 +557,7 @@
       const namaLower = (p.nama || '').toLowerCase();
       const punyaHargaBtg = p.hargaBatang && Number(p.hargaBatang) > 0;
 
-      if (namaLower.includes('s.p') || namaLower.includes('evo') || punyaHargaBtg) {
+      if (namaLower.includes('s.p') || namaLower.includes('evo') || punyaHargaBtg || (p.kategori || '').toLowerCase() === 'rokok') {
         if (!p.isRokok) { p.isRokok = true; adaPerubahan = true; }
         if (!p.hargaBatang || Number(p.hargaBatang) === 0) { p.hargaBatang = 2000; adaPerubahan = true; }
         if (!p.isiBatang) { p.isiBatang = 16; adaPerubahan = true; }
@@ -540,20 +576,21 @@
     container.innerHTML = ''; chipList.innerHTML = ''; selectKat.innerHTML = '';
 
     appData.kategori.forEach(kat => {
+      const icon = getCategoryIcon(kat);
       const btn = document.createElement('button');
       btn.className = `filter-btn ${activeKatFilter === kat ? 'active' : ''}`;
-      btn.innerText = kat;
+      btn.innerText = `${kat === 'Semua' ? '✨' : icon} ${kat}`;
       btn.onclick = () => { activeKatFilter = kat; renderKategori(); renderKasirProduk(); };
       container.appendChild(btn);
 
       if (kat !== 'Semua') {
         const opt = document.createElement('option');
-        opt.value = kat; opt.innerText = kat;
+        opt.value = kat; opt.innerText = `${icon} ${kat}`;
         selectKat.appendChild(opt);
 
         const chip = document.createElement('span');
         chip.style.cssText = "background:#e2e8f0; font-size:11px; padding:3px 8px; border-radius:12px; margin-right:4px;";
-        chip.innerText = kat;
+        chip.innerText = `${icon} ${kat}`;
         chipList.appendChild(chip);
       }
     });
@@ -604,7 +641,7 @@
 
     const itemData = {
       barcode, foto: tempFotoProduct, nama, kategori, harga, hpp, stok,
-      isRokok: hrgBt && Number(hrgBt) > 0 ? true : false,
+      isRokok: (hrgBt && Number(hrgBt) > 0) || (kategori.toLowerCase() === 'rokok'),
       isiBatang: isiBt ? parseInt(isiBt) : null,
       hargaBatang: hrgBt ? parseFloat(hrgBt) : null,
       stokBatang: stokBt ? parseInt(stokBt) : 0
@@ -646,13 +683,15 @@
     appData.produk.forEach(p => {
       const row = document.createElement('div');
       row.className = 'list-row';
+      const pIcon = getProductIcon(p);
+
       row.innerHTML = `
         <div style="display:flex; align-items:center; gap:8px;">
-          ${p.foto ? `<img src="${p.foto}" style="width:40px; height:40px; object-fit:cover; border-radius:6px;">` : ''}
+          ${p.foto ? `<img src="${p.foto}" style="width:40px; height:40px; object-fit:cover; border-radius:6px;">` : `<span style="font-size:24px;">${pIcon}</span>`}
           <div>
             <b>${p.nama}</b> <small>(${p.kategori})</small>
             <div>Rp ${p.harga.toLocaleString('id-ID')} | Stok: ${p.stok !== null ? p.stok : '∞'}</div>
-            ${p.hargaBatang ? `<small style="color:#0d9488;">Eceran: Rp ${p.hargaBatang.toLocaleString('id-ID')}/btg (Stok: ${p.stokBatang || 0} btg)</small>` : ''}
+            ${p.hargaBatang ? `<small style="color:#0d9488;">🚬 Eceran: Rp ${p.hargaBatang.toLocaleString('id-ID')}/btg (Stok: ${p.stokBatang || 0} btg)</small>` : ''}
           </div>
         </div>
         <div style="display:flex; gap:4px;">
@@ -701,15 +740,15 @@
     const search = document.getElementById('kasir-search').value.toLowerCase();
     list.innerHTML = '';
 
-    // Selalu tampilkan Card Seblak Prasmanan di awal jika kategori "Semua" atau "Makanan"
+    // Card Seblak Prasmanan dengan ikon Mangkok
     if ((activeKatFilter === 'Semua' || activeKatFilter === 'Makanan') && ('seblak prasmanan'.includes(search) || search === '')) {
       const seblakCard = document.createElement('div');
       seblakCard.className = 'kasir-item-card';
       seblakCard.style.border = '1px solid #f59e0b';
       seblakCard.innerHTML = `
-        <div class="kasir-item-img" style="background:#fffbeb;">🍜</div>
+        <div class="kasir-item-img" style="background:#fffbeb;">🥣</div>
         <div class="kasir-item-info">
-          <div class="kasir-item-name">Seblak Prasmanan</div>
+          <div class="kasir-item-name">🥣 Seblak Prasmanan</div>
           <div class="kasir-item-price" style="color:#d97706;">Harga Fleksibel</div>
           <div class="kasir-item-stock">Bebas racik topping</div>
         </div>
@@ -729,26 +768,25 @@
     filtered.forEach(p => {
       const card = document.createElement('div');
       card.className = 'kasir-item-card';
+      const pIcon = getProductIcon(p);
 
       const imgHtml = p.foto ? `<img src="${p.foto}" class="kasir-item-img">` : `
-        <div class="kasir-item-img">
-          <svg viewBox="0 0 24 24" width="36" height="36" stroke="#cbd5e1" fill="none" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-        </div>`;
+        <div class="kasir-item-img">${pIcon}</div>`;
 
       const hasEceran = p.hargaBatang && Number(p.hargaBatang) > 0;
 
       card.innerHTML = `
         ${imgHtml}
         <div class="kasir-item-info">
-          <div class="kasir-item-name">${p.nama}</div>
+          <div class="kasir-item-name">${pIcon} ${p.nama}</div>
           <div class="kasir-item-price">Rp ${p.harga.toLocaleString('id-ID')}</div>
           <div class="kasir-item-stock">Stok: ${p.stok !== null ? p.stok : '∞'}</div>
-          ${hasEceran ? `<div style="font-size:11px; color:#0d9488; margin-top:2px; font-weight:600;">Eceran: Rp ${p.hargaBatang.toLocaleString('id-ID')}/btg</div>` : ''}
+          ${hasEceran ? `<div style="font-size:11px; color:#0d9488; margin-top:2px; font-weight:600;">🚬 Ecer: Rp ${p.hargaBatang.toLocaleString('id-ID')}/btg</div>` : ''}
         </div>
         <div style="padding: 0 8px 8px 8px; display:flex; gap:4px;">
           ${hasEceran ? `
             <button class="btn btn-sm btn-secondary" style="flex:1; padding:4px;" onclick="tambahKeCart(${p.id}, 'bungkus')">+ Pack</button>
-            <button class="btn btn-sm btn-primary" style="flex:1; padding:4px;" onclick="tambahKeCart(${p.id}, 'batang')">+ Batang</button>
+            <button class="btn btn-sm btn-primary" style="flex:1; padding:4px;" onclick="tambahKeCart(${p.id}, 'batang')">+ Btg</button>
           ` : `
             <button class="btn btn-sm btn-primary" style="width:100%; padding:6px;" onclick="tambahKeCart(${p.id}, 'bungkus')">+ Tambah</button>
           `}
@@ -777,14 +815,14 @@
       return;
     }
 
-    const namaSeblak = catatan ? `Seblak Prasmanan (${catatan})` : `Seblak Prasmanan`;
+    const namaSeblak = catatan ? `🥣 Seblak Prasmanan (${catatan})` : `🥣 Seblak Prasmanan`;
 
     appData.keranjang.push({
       cartKey: `seblak_${Date.now()}`,
       id: 'seblak_custom',
       nama: namaSeblak,
       harga: harga,
-      hpp: harga * 0.5, // Perkiraan HPP 50%
+      hpp: harga * 0.5,
       qty: 1,
       tipe: 'seblak'
     });
@@ -803,7 +841,8 @@
     const itemInCart = appData.keranjang.find(x => x.cartKey === cartKey);
     const isBatang = (tipe === 'batang');
     const hargaJual = isBatang ? p.hargaBatang : p.harga;
-    const labelNama = isBatang ? `${p.nama} (Batangan)` : p.nama;
+    const pIcon = getProductIcon(p);
+    const labelNama = isBatang ? `${pIcon} ${p.nama} (Batangan)` : `${pIcon} ${p.nama}`;
 
     if (itemInCart) {
       itemInCart.qty += 1;
@@ -824,17 +863,29 @@
     const text = document.getElementById('float-cart-text');
     
     let totalItems = 0;
-    let totalPrice = 0;
+    let subtotal = 0;
 
     appData.keranjang.forEach(item => {
       totalItems += item.qty;
-      totalPrice += (item.harga * item.qty);
+      subtotal += (item.harga * item.qty);
     });
+
+    // Kalkulasi diskon untuk floating cart
+    const tipeDiskon = document.getElementById('cart-diskon-tipe')?.value || 'rp';
+    const nilaiDiskon = parseFloat(document.getElementById('cart-diskon-nilai')?.value) || 0;
+    let potongan = 0;
+
+    if (tipeDiskon === 'percent') {
+      potongan = (subtotal * nilaiDiskon) / 100;
+    } else {
+      potongan = nilaiDiskon;
+    }
+    const totalFinal = Math.max(0, subtotal - potongan);
 
     const isKasirPage = document.getElementById('page-kasir').classList.contains('active');
 
     if (totalItems > 0 && isKasirPage) {
-      text.innerText = `Keranjang (${totalItems} item) • Rp ${totalPrice.toLocaleString('id-ID')}`;
+      text.innerText = `Keranjang (${totalItems} item) • Rp ${totalFinal.toLocaleString('id-ID')}`;
       btn.style.display = 'flex';
     } else {
       btn.style.display = 'none';
@@ -852,11 +903,9 @@
   function renderCart() {
     const list = document.getElementById('kasir-cart-list');
     list.innerHTML = '';
-    let total = 0;
 
     appData.keranjang.forEach((item, index) => {
-      const subtotal = item.harga * item.qty;
-      total += subtotal;
+      const subtotalItem = item.harga * item.qty;
 
       const row = document.createElement('div');
       row.className = 'list-row';
@@ -864,7 +913,7 @@
       row.innerHTML = `
         <div>
           <b>${item.nama}</b>
-          <div>@ Rp ${item.harga.toLocaleString('id-ID')} x ${item.qty} = Rp ${subtotal.toLocaleString('id-ID')}</div>
+          <div>@ Rp ${item.harga.toLocaleString('id-ID')} x ${item.qty} = Rp ${subtotalItem.toLocaleString('id-ID')}</div>
         </div>
         <div style="display:flex; gap:4px; align-items:center;">
           <button class="btn btn-sm btn-secondary" onclick="ubahQtyCart(${index}, -1)">-</button>
@@ -876,7 +925,30 @@
       list.appendChild(row);
     });
 
-    document.getElementById('kasir-total').value = total;
+    hitungTotalBelanjaCart();
+  }
+
+  function hitungTotalBelanjaCart() {
+    let subtotal = 0;
+    appData.keranjang.forEach(item => {
+      subtotal += (item.harga * item.qty);
+    });
+
+    const tipeDiskon = document.getElementById('cart-diskon-tipe').value;
+    const nilaiDiskon = parseFloat(document.getElementById('cart-diskon-nilai').value) || 0;
+    let potongan = 0;
+
+    if (tipeDiskon === 'percent') {
+      potongan = (subtotal * nilaiDiskon) / 100;
+    } else {
+      potongan = nilaiDiskon;
+    }
+
+    const totalAkhir = Math.max(0, subtotal - potongan);
+
+    document.getElementById('kasir-subtotal-text').value = `Rp ${subtotal.toLocaleString('id-ID')}`;
+    document.getElementById('kasir-total').value = totalAkhir;
+
     hitungKembalian();
     updateFloatingCart();
   }
@@ -932,6 +1004,15 @@
       return;
     }
 
+    let subtotal = 0;
+    appData.keranjang.forEach(i => subtotal += (i.harga * i.qty));
+
+    const tipeDiskon = document.getElementById('cart-diskon-tipe').value;
+    const nilaiDiskon = parseFloat(document.getElementById('cart-diskon-nilai').value) || 0;
+    let potongan = 0;
+    if (tipeDiskon === 'percent') potongan = (subtotal * nilaiDiskon) / 100;
+    else potongan = nilaiDiskon;
+
     let sisaKurang = 0;
 
     if (metode === 'Tunai' && bayar < total) {
@@ -947,6 +1028,8 @@
       id: `TRX-${Date.now()}`,
       waktu: new Date().toLocaleString('id-ID'),
       item: [...appData.keranjang],
+      subtotal,
+      potonganDiskon: potongan,
       total, metode, bayar,
       kembali: (metode === 'Tunai' && bayar >= total) ? (bayar - total) : 0,
       sisaKurang
@@ -1013,6 +1096,7 @@
 
     appData.keranjang = [];
     document.getElementById('kasir-bayar').value = '';
+    document.getElementById('cart-diskon-nilai').value = '';
     saveLocal();
     renderCart();
     renderKasirProduk();
@@ -1044,6 +1128,10 @@
       <hr style="margin:4px 0; border:none; border-top:1px dashed #000;">
       ${itemRows}
       <hr style="margin:4px 0; border:none; border-top:1px dashed #000;">
+      ${trx.potonganDiskon > 0 ? `
+        <div class="receipt-row"><span>Subtotal:</span> <span>Rp ${(trx.subtotal || trx.total).toLocaleString('id-ID')}</span></div>
+        <div class="receipt-row"><span>Diskon:</span> <span>-Rp ${trx.potonganDiskon.toLocaleString('id-ID')}</span></div>
+      ` : ''}
       <div class="receipt-row"><b>Total:</b> <b>Rp ${trx.total.toLocaleString('id-ID')}</b></div>
       <div class="receipt-row"><span>Metode:</span> <span>${trx.metode}</span></div>
       <div class="receipt-row"><span>Bayar:</span> <span>Rp ${trx.bayar.toLocaleString('id-ID')}</span></div>
@@ -1247,9 +1335,9 @@
   }
 
   function exportLaporanCSV() {
-    let csv = "ID,Waktu,Metode,Total,Pelanggan\n";
+    let csv = "ID,Waktu,Metode,Subtotal,Diskon,Total,Pelanggan\n";
     appData.transaksi.forEach(t => {
-      csv += `"${t.id}","${t.waktu}","${t.metode}",${t.total},"${t.pelanggan||''}"\n`;
+      csv += `"${t.id}","${t.waktu}","${t.metode}",${t.subtotal||t.total},${t.potonganDiskon||0},${t.total},"${t.pelanggan||''}"\n`;
     });
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
