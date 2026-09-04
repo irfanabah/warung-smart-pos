@@ -27,6 +27,7 @@
     .btn-secondary { background: #f1f5f9; color: #475569; }
     .btn-danger { background: #ef4444; color: #fff; }
     .btn-success { background: #22c55e; color: #fff; }
+    .btn-warning { background: #f59e0b; color: #fff; }
     .btn-sm { padding: 6px 10px; font-size: 12px; }
     .btn-full { width: 100%; }
 
@@ -49,7 +50,7 @@
 
     .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
     .kasir-item-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; }
-    .kasir-item-img { width: 100%; height: 90px; object-fit: cover; background: #f8fafc; display: flex; align-items: center; justify-content: center; color: #cbd5e1; }
+    .kasir-item-img { width: 100%; height: 90px; object-fit: cover; background: #f8fafc; display: flex; align-items: center; justify-content: center; color: #cbd5e1; font-size: 24px; }
     .kasir-item-info { padding: 8px; }
     .kasir-item-name { font-weight: 600; font-size: 13px; color: #1e293b; line-height: 1.2; margin-bottom: 4px; }
     .kasir-item-price { font-weight: 700; color: #0d9488; font-size: 13px; }
@@ -306,6 +307,25 @@
     </button>
   </nav>
 
+</div>
+
+<!-- MODAL SEBLAK PRASMANAN -->
+<div id="modal-seblak" class="modal">
+  <div class="modal-content">
+    <div class="title">
+      <span>🍜 Seblak Prasmanan</span>
+      <button class="btn btn-sm btn-secondary" onclick="tutupModalSeblak()">Tutup</button>
+    </div>
+    <div class="form-group">
+      <label>Harga Porsi (Rp) *</label>
+      <input type="number" id="seblak-harga" class="form-control" placeholder="Contoh: 12000">
+    </div>
+    <div class="form-group">
+      <label>Catatan Isian / Topping / Level Pedas (Opsional)</label>
+      <input type="text" id="seblak-catatan" class="form-control" placeholder="Contoh: Kerupuk, Bakso, Lv 3">
+    </div>
+    <button class="btn btn-warning btn-full" onclick="tambahSeblakKeCart()">+ Masukkan Keranjang</button>
+  </div>
 </div>
 
 <!-- MODAL KERANJANG & PEMBAYARAN -->
@@ -681,6 +701,25 @@
     const search = document.getElementById('kasir-search').value.toLowerCase();
     list.innerHTML = '';
 
+    // Selalu tampilkan Card Seblak Prasmanan di awal jika kategori "Semua" atau "Makanan"
+    if ((activeKatFilter === 'Semua' || activeKatFilter === 'Makanan') && ('seblak prasmanan'.includes(search) || search === '')) {
+      const seblakCard = document.createElement('div');
+      seblakCard.className = 'kasir-item-card';
+      seblakCard.style.border = '1px solid #f59e0b';
+      seblakCard.innerHTML = `
+        <div class="kasir-item-img" style="background:#fffbeb;">🍜</div>
+        <div class="kasir-item-info">
+          <div class="kasir-item-name">Seblak Prasmanan</div>
+          <div class="kasir-item-price" style="color:#d97706;">Harga Fleksibel</div>
+          <div class="kasir-item-stock">Bebas racik topping</div>
+        </div>
+        <div style="padding: 0 8px 8px 8px;">
+          <button class="btn btn-sm btn-warning" style="width:100%;" onclick="bukaModalSeblak()">+ Atur Seblak</button>
+        </div>
+      `;
+      list.appendChild(seblakCard);
+    }
+
     const filtered = appData.produk.filter(p => {
       const matchKat = (activeKatFilter === 'Semua' || p.kategori === activeKatFilter);
       const matchSearch = p.nama.toLowerCase().includes(search) || (p.barcode && p.barcode.toLowerCase().includes(search));
@@ -717,6 +756,43 @@
       `;
       list.appendChild(card);
     });
+  }
+
+  function bukaModalSeblak() {
+    document.getElementById('seblak-harga').value = '';
+    document.getElementById('seblak-catatan').value = '';
+    document.getElementById('modal-seblak').classList.add('active');
+  }
+
+  function tutupModalSeblak() {
+    document.getElementById('modal-seblak').classList.remove('active');
+  }
+
+  function tambahSeblakKeCart() {
+    const harga = parseFloat(document.getElementById('seblak-harga').value) || 0;
+    const catatan = document.getElementById('seblak-catatan').value.trim();
+
+    if (harga <= 0) {
+      showToast("Masukkan harga porsi seblak!", "error");
+      return;
+    }
+
+    const namaSeblak = catatan ? `Seblak Prasmanan (${catatan})` : `Seblak Prasmanan`;
+
+    appData.keranjang.push({
+      cartKey: `seblak_${Date.now()}`,
+      id: 'seblak_custom',
+      nama: namaSeblak,
+      harga: harga,
+      hpp: harga * 0.5, // Perkiraan HPP 50%
+      qty: 1,
+      tipe: 'seblak'
+    });
+
+    tutupModalSeblak();
+    renderCart();
+    updateFloatingCart();
+    showToast(`${namaSeblak} dimasukkan keranjang!`);
   }
 
   function tambahKeCart(id, tipe = 'bungkus') {
@@ -923,10 +999,12 @@
     trx.pelanggan = pelanggan;
 
     trx.item.forEach(item => {
-      const p = appData.produk.find(x => x.id === item.id);
-      if (p) {
-        if (item.tipe === 'batang' && p.stokBatang !== undefined) p.stokBatang -= item.qty;
-        else if (item.tipe === 'bungkus' && p.stok !== null) p.stok -= item.qty;
+      if (item.id !== 'seblak_custom') {
+        const p = appData.produk.find(x => x.id === item.id);
+        if (p) {
+          if (item.tipe === 'batang' && p.stokBatang !== undefined) p.stokBatang -= item.qty;
+          else if (item.tipe === 'bungkus' && p.stok !== null) p.stok -= item.qty;
+        }
       }
     });
 
