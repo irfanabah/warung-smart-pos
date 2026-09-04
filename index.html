@@ -4,23 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kasir Warung Super</title>
-  <!-- Library QR Code / Barcode Scanner -->
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
     body { background-color: #f4f6f8; color: #333; font-size: 14px; padding-bottom: 70px; }
 
-    /* App Container */
     .app-container { width: 100%; max-width: 480px; margin: 0 auto; min-height: 100vh; background: #fff; display: flex; flex-direction: column; position: relative; }
     .content { padding: 16px; flex: 1; }
     .page { display: none; }
     .page.active { display: block; }
 
-    /* UI Cards & Elements */
     .card { background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 12px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
     .title { font-size: 16px; font-weight: 700; color: #1e293b; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
     
-    /* Buttons & Inputs */
     .btn { display: inline-flex; align-items: center; justify-content: center; padding: 10px 16px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 13px; text-decoration: none; gap: 6px; }
     .btn-primary { background: #0d9488; color: #fff; }
     .btn-primary:active { background: #0f766e; }
@@ -36,13 +33,11 @@
     .form-control { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline: none; }
     .form-control:focus { border-color: #0d9488; }
 
-    /* Navigation Bottom Bar */
     .navbar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: #fff; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-around; padding: 8px 0; z-index: 1000; }
     .nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #64748b; font-size: 10px; font-weight: 600; cursor: pointer; width: 20%; border: none; background: transparent; }
     .nav-item.active { color: #0d9488; }
     .nav-item svg { width: 22px; height: 22px; margin-bottom: 2px; fill: currentColor; }
 
-    /* Filter & Catalog Grid */
     .filter-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 12px; scrollbar-width: none; }
     .filter-scroll::-webkit-scrollbar { display: none; }
     .filter-btn { padding: 6px 14px; border-radius: 20px; background: #f1f5f9; color: #64748b; border: none; font-size: 12px; font-weight: 600; white-space: nowrap; cursor: pointer; }
@@ -56,34 +51,30 @@
     .kasir-item-price { font-weight: 700; color: #0d9488; font-size: 13px; }
     .kasir-item-stock { font-size: 10px; color: #94a3b8; }
 
-    /* List Rows */
     .list-row { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #f1f5f9; }
     .list-row:last-child { border-bottom: none; }
 
-    /* Floating Cart Button */
     .floating-cart { position: fixed; bottom: 65px; left: 50%; transform: translateX(-50%); width: calc(100% - 32px); max-width: 448px; background: #0d9488; color: #fff; padding: 12px 16px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3); z-index: 999; cursor: pointer; border: none; }
 
-    /* Modals */
     .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: flex-end; z-index: 2000; }
     .modal.active { display: flex; }
     .modal-content { background: #fff; width: 100%; max-width: 480px; border-radius: 16px 16px 0 0; max-height: 85vh; overflow-y: auto; padding: 16px; animation: slideUp 0.2s ease-out; }
     @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
-    /* Receipt Print Styling */
     .receipt { font-family: 'Courier New', Courier, monospace; font-size: 12px; color: #000; padding: 10px; width: 100%; }
     .receipt-header { text-align: center; margin-bottom: 10px; }
     .receipt-row { display: flex; justify-content: space-between; margin-bottom: 4px; }
 
-    /* Toast Notification */
     #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 3000; width: 90%; max-width: 400px; pointer-events: none; }
     .toast { background: #1e293b; color: #fff; padding: 10px 16px; border-radius: 8px; font-size: 13px; margin-bottom: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 8px; animation: fadeIn 0.3s; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(-10%); } to { opacity: 1; transform: translateY(0); } }
 
-    /* Badges */
     .badge { padding: 3px 8px; border-radius: 12px; font-size: 10px; font-weight: 700; }
     .badge-success { background: #dcfce7; color: #166534; }
     .badge-warning { background: #fef3c7; color: #92400e; }
     .badge-danger { background: #fee2e2; color: #991b1b; }
+
+    .camera-preview { width: 100%; max-height: 250px; background: #000; border-radius: 8px; object-fit: cover; margin-bottom: 10px; }
   </style>
 </head>
 <body>
@@ -92,10 +83,8 @@
 
 <div class="app-container">
   
-  <!-- CONTENT AREA -->
   <div class="content">
 
-    <!-- PAGE 1: BERANDA / DASHBOARD -->
     <div id="page-beranda" class="page active">
       <div class="title">
         <span>Beranda</span>
@@ -130,17 +119,22 @@
       </div>
     </div>
 
-    <!-- PAGE 2: MASTER PRODUK -->
     <div id="page-produk" class="page">
       <div class="title">Manajemen Produk</div>
       
       <div class="card">
         <div style="font-weight:700; margin-bottom:10px;">Tambah / Edit Produk</div>
+        
+        <div style="margin-bottom:12px; background:#f0fdf4; border:1px dashed #22c55e; padding:10px; border-radius:8px;">
+          <div style="font-weight:bold; font-size:12px; color:#166534; margin-bottom:4px;">📷 Produk Tanpa Kode / Barcode?</div>
+          <button class="btn btn-success btn-sm btn-full" onclick="bukaModalVisualScan('produk')">📸 Ambil Foto & Analisa Kemasan</button>
+        </div>
+
         <div class="form-group">
-          <label>Barcode / QR</label>
+          <label>Barcode / QR (Opsional)</label>
           <div style="display:flex; gap:6px;">
             <input type="text" id="p-barcode" class="form-control" placeholder="Scan/ketik barcode">
-            <button class="btn btn-secondary" onclick="bukaModalScanner('produk')">Scan</button>
+            <button class="btn btn-secondary" onclick="bukaModalScanner('produk')">Scan Code</button>
           </div>
         </div>
         <div class="form-group">
@@ -204,13 +198,15 @@
       </div>
     </div>
 
-    <!-- PAGE 3: KASIR / KATALOG -->
     <div id="page-kasir" class="page">
       <div class="title">Katalog & Kasir</div>
 
-      <div style="display:flex; gap:6px; margin-bottom:10px;">
+      <div style="display:flex; flex-direction:column; gap:6px; margin-bottom:10px;">
         <input type="text" id="kasir-search" class="form-control" placeholder="Cari nama atau barcode..." onkeyup="renderKasirProduk()">
-        <button class="btn btn-secondary" onclick="bukaModalScanner('kasir')">Scan</button>
+        <div style="display:flex; gap:6px;">
+          <button class="btn btn-secondary btn-full btn-sm" onclick="bukaModalScanner('kasir')">🔍 Scan Barcode</button>
+          <button class="btn btn-success btn-full btn-sm" onclick="bukaModalVisualScan('kasir')">📸 Scan Gambar Produk</button>
+        </div>
       </div>
 
       <div class="filter-scroll" id="kasir-kategori-filter"></div>
@@ -218,7 +214,6 @@
       <div class="grid-2" id="kasir-produk-list"></div>
     </div>
 
-    <!-- PAGE 4: KASBON / PIUTANG -->
     <div id="page-kasbon" class="page">
       <div class="title">Catatan Kasbon / Piutang</div>
       <div class="card">
@@ -226,7 +221,6 @@
       </div>
     </div>
 
-    <!-- PAGE 5: SETTING -->
     <div id="page-setting" class="page">
       <div class="title">Pengaturan Toko</div>
       <div class="card">
@@ -277,13 +271,11 @@
 
   </div>
 
-  <!-- FLOATING CART BUTTON -->
   <button id="btn-floating-cart" class="floating-cart" style="display:none;" onclick="bukaModalKeranjang()">
     <span id="float-cart-text">Keranjang (0 item) • Rp 0</span>
     <span style="font-weight:bold;">Bayar &rsaquo;</span>
   </button>
 
-  <!-- BOTTOM NAVBAR -->
   <nav class="navbar">
     <button class="nav-item active" onclick="switchTab('Beranda')">
       <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
@@ -309,7 +301,25 @@
 
 </div>
 
-<!-- MODAL SEBLAK PRASMANAN -->
+<div id="modal-visual-scan" class="modal">
+  <div class="modal-content">
+    <div class="title">
+      <span>📸 Scan Foto Produk / Kemasan</span>
+      <button class="btn btn-sm btn-secondary" onclick="tutupModalVisualScan()">Tutup</button>
+    </div>
+    <video id="visual-video" class="camera-preview" autoplay playsinline></video>
+    <canvas id="visual-canvas" style="display:none;"></canvas>
+    
+    <div id="visual-loading" style="display:none; text-align:center; padding:10px; color:#0d9488; font-weight:bold;">
+      ⏳ Memproses & Menganalisa Gambar...
+    </div>
+
+    <div style="display:flex; gap:6px; margin-top:8px;">
+      <button class="btn btn-primary btn-full" onclick="tangkapFotoVisual()">📸 Ambil Foto & Deteksi</button>
+    </div>
+  </div>
+</div>
+
 <div id="modal-seblak" class="modal">
   <div class="modal-content">
     <div class="title">
@@ -321,14 +331,13 @@
       <input type="number" id="seblak-harga" class="form-control" placeholder="Contoh: 12000">
     </div>
     <div class="form-group">
-      <label>Catatan Isian / Topping / Level Pedas (Opsional)</label>
+      <label>Catatan Isian / Topping / Level Pedas</label>
       <input type="text" id="seblak-catatan" class="form-control" placeholder="Contoh: Kerupuk, Bakso, Lv 3">
     </div>
     <button class="btn btn-warning btn-full" onclick="tambahSeblakKeCart()">+ Masukkan Keranjang</button>
   </div>
 </div>
 
-<!-- MODAL KERANJANG & PEMBAYARAN -->
 <div id="modal-keranjang" class="modal">
   <div class="modal-content">
     <div class="title">
@@ -339,8 +348,6 @@
     <div id="kasir-cart-list"></div>
 
     <div style="border-top:1px solid #e2e8f0; margin-top:12px; padding-top:12px;">
-      
-      <!-- FITUR DISKON CUSTOM -->
       <div class="card" style="background:#f8fafc; border:1px dashed #cbd5e1; padding:10px; margin-bottom:12px;">
         <div style="font-weight:700; font-size:12px; margin-bottom:6px; color:#475569;">🏷️ Diskon Custom (Bebas)</div>
         <div style="display:flex; gap:6px;">
@@ -386,7 +393,6 @@
   </div>
 </div>
 
-<!-- MODAL INPUT KASBON -->
 <div id="modal-kasbon-input" class="modal">
   <div class="modal-content">
     <div class="title">Catat Data Kasbon</div>
@@ -409,7 +415,6 @@
   </div>
 </div>
 
-<!-- MODAL STRUK -->
 <div id="modal-struk" class="modal">
   <div class="modal-content">
     <div class="title">
@@ -424,7 +429,6 @@
   </div>
 </div>
 
-<!-- MODAL BARCODE SCANNER -->
 <div id="modal-scanner" class="modal">
   <div class="modal-content">
     <div class="title">
@@ -457,8 +461,9 @@
   let html5QrcodeScanner = null;
   let scanModeTarget = "kasir";
   let pendingKasbonTrx = null;
+  let visualStream = null;
+  let visualTarget = "kasir";
 
-  // Helper Ikon Kategori & Produk
   function getCategoryIcon(kat) {
     switch((kat || '').toLowerCase()) {
       case 'makanan': return '🍲';
@@ -497,18 +502,12 @@
       container.id = 'toast-container';
       document.body.appendChild(container);
     }
-    
     const toast = document.createElement('div');
     toast.className = 'toast';
-    
     const icon = tipe === 'success' ? '✅' : tipe === 'error' ? '❌' : 'ℹ️';
     toast.innerHTML = `<span>${icon}</span><span>${pesan}</span>`;
-    
     container.appendChild(toast);
-
-    setTimeout(() => {
-      toast.remove();
-    }, 3000);
+    setTimeout(() => { toast.remove(); }, 3000);
   }
 
   function saveLocal() {
@@ -518,11 +517,7 @@
   function loadLocal() {
     const data = localStorage.getItem('warung_pos_data');
     if (data) {
-      try {
-        appData = JSON.parse(data);
-      } catch(e) {
-        console.error("Gagal parse localStorage:", e);
-      }
+      try { appData = JSON.parse(data); } catch(e) { console.error("Gagal parse localstorage:", e); }
     }
   }
 
@@ -566,6 +561,84 @@
     });
 
     if (adaPerubahan) saveLocal();
+  }
+
+  // LOGIKA CAMERA SCANNER VISUAL & OCR ANALISA
+  async function bukaModalVisualScan(target) {
+    visualTarget = target;
+    document.getElementById('modal-visual-scan').classList.add('active');
+    const video = document.getElementById('visual-video');
+    
+    try {
+      visualStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment' }
+      });
+      video.srcObject = visualStream;
+    } catch (err) {
+      showToast("Gagal mengakses kamera!", "error");
+      tutupModalVisualScan();
+    }
+  }
+
+  function tutupModalVisualScan() {
+    document.getElementById('modal-visual-scan').classList.remove('active');
+    if (visualStream) {
+      visualStream.getTracks().forEach(track => track.stop());
+      visualStream = null;
+    }
+    document.getElementById('visual-loading').style.display = 'none';
+  }
+
+  async function tangkapFotoVisual() {
+    const video = document.getElementById('visual-video');
+    const canvas = document.getElementById('visual-canvas');
+    const loading = document.getElementById('visual-loading');
+
+    canvas.width = video.videoWidth || 640;
+    canvas.height = video.videoHeight || 480;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    const base64Img = canvas.toDataURL('image/jpeg');
+    loading.style.display = 'block';
+
+    try {
+      const worker = await Tesseract.createWorker('ind');
+      const ret = await worker.recognize(base64Img);
+      await worker.terminate();
+
+      const textDitemukan = ret.data.text.trim().replace(/\n/g, ' ');
+      loading.style.display = 'none';
+
+      if (visualTarget === 'produk') {
+        tempFotoProduct = base64Img;
+        const img = document.getElementById('p-foto-img');
+        img.src = tempFotoProduct;
+        img.style.display = 'block';
+
+        if (textDitemukan) {
+          const kataBersih = textDitemukan.split(' ').filter(w => w.length > 2).slice(0, 4).join(' ');
+          document.getElementById('p-nama').value = kataBersih || textDitemukan.slice(0, 20);
+          showToast("Foto & Nama terdeteksi!");
+        } else {
+          showToast("Foto diambil!");
+        }
+      } else if (visualTarget === 'kasir') {
+        if (textDitemukan) {
+          const kataPertama = textDitemukan.split(' ')[0];
+          document.getElementById('kasir-search').value = kataPertama;
+          renderKasirProduk();
+          showToast(`Mencari: "${kataPertama}"`);
+        } else {
+          showToast("Tidak dapat membaca teks pada kemasan", "error");
+        }
+      }
+      tutupModalVisualScan();
+    } catch (err) {
+      loading.style.display = 'none';
+      showToast("Gagal memproses gambar", "error");
+      tutupModalVisualScan();
+    }
   }
 
   function renderKategori() {
@@ -740,7 +813,6 @@
     const search = document.getElementById('kasir-search').value.toLowerCase();
     list.innerHTML = '';
 
-    // Card Seblak Prasmanan dengan ikon Mangkok
     if ((activeKatFilter === 'Semua' || activeKatFilter === 'Makanan') && ('seblak prasmanan'.includes(search) || search === '')) {
       const seblakCard = document.createElement('div');
       seblakCard.className = 'kasir-item-card';
@@ -870,7 +942,6 @@
       subtotal += (item.harga * item.qty);
     });
 
-    // Kalkulasi diskon untuk floating cart
     const tipeDiskon = document.getElementById('cart-diskon-tipe')?.value || 'rp';
     const nilaiDiskon = parseFloat(document.getElementById('cart-diskon-nilai')?.value) || 0;
     let potongan = 0;
