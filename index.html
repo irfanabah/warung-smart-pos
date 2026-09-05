@@ -522,13 +522,12 @@
     }
   });
 
-  if (tabName.toLowerCase() === 'beranda') {
-    renderDashboard();
-  }
-  
-  if (tabName.toLowerCase() === 'kasir') {
-    renderKasirKategoriFilter();
-    renderKasirProduk();
+  const tabLower = tabName.toLowerCase();
+  if (tabLower === 'beranda') {
+    if (typeof renderDashboard === 'function') renderDashboard();
+  } else if (tabLower === 'kasir') {
+    if (typeof renderKasirKategoriFilter === 'function') renderKasirKategoriFilter();
+    if (typeof renderKasirProduk === 'function') renderKasirProduk();
   }
 }
 
