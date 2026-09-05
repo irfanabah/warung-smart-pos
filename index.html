@@ -508,25 +508,30 @@
   }
 
   function switchTab(tabName) {
-    const pages = document.querySelectorAll('.page');
-    pages.forEach(p => p.classList.remove('active'));
-    
-    const targetPage = document.getElementById('page-' + tabName.toLowerCase());
-    if (targetPage) targetPage.classList.add('active');
+  const pages = document.querySelectorAll('.page');
+  pages.forEach(p => p.classList.remove('active'));
 
-    const navItems = document.querySelectorAll('.nav-item');
-    navItems.forEach(item => {
-      item.classList.remove('active');
-      if (item.innerText.trim().toLowerCase() === tabName.toLowerCase()) {
-        item.classList.add('active');
-      }
-    });
+  const targetPage = document.getElementById('page-' + tabName.toLowerCase());
+  if (targetPage) targetPage.classList.add('active');
 
-    if (tabName === 'Beranda') renderDashboard();
-    if (tabName === 'Kasir') {
-      renderKasirKategoriFilter();
-      renderKasirProduk();
+  const navItems = document.querySelectorAll('.nav-item');
+  navItems.forEach(item => {
+    item.classList.remove('active');
+    if (item.innerText.trim().toLowerCase() === tabName.toLowerCase()) {
+      item.classList.add('active');
     }
+  });
+
+  if (tabName.toLowerCase() === 'beranda') {
+    renderDashboard();
+  }
+  
+  if (tabName.toLowerCase() === 'kasir') {
+    renderKasirKategoriFilter();
+    renderKasirProduk();
+  }
+}
+
     if (tabName === 'Produk') renderMasterProduk();
     if (tabName === 'Kasbon') renderKasbonList();
     if (tabName === 'Setting') loadSettingForm();
