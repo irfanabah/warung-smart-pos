@@ -885,47 +885,56 @@
   }
 
   function renderKasirProduk() {
-    const container = document.getElementById('kasir-produk-list');
-    if (!container) return;
-
-    const list = getStorage('produkList', []);
-    const keyword = (document.getElementById('kasir-search').value || '').toLowerCase();
-
-    const filtered = list.filter(p => {
-      const pKat = p.kategori || 'Umum';
-      const matchKat = currentKategoriKasir === 'Semua' || pKat === currentKategoriKasir;
-      const matchKw = p.nama.toLowerCase().includes(keyword) || (p.barcode && p.barcode.toLowerCase().includes(keyword));
-      return matchKat && matchKw;
-    });
-
-    if (filtered.length === 0) {
-      container.innerHTML = `<div style="grid-column: span 2; text-align:center; padding:20px; color:#94a3b8;">Tidak ada produk ditampilkan</div>`;
-      return;
-    }
-
-    let html = '';
-    filtered.forEach(p => {
-      const imgHtml = p.foto ? `<img src="${p.foto}" class="kasir-item-img">` : `<div class="kasir-item-img">📦</div>`;
-      let stokText = p.stok === null ? 'Stok: ∞' : `Stok: ${p.stok}`;
-
-      html += `
-        <div class="kasir-item-card" onclick="tambahKeKeranjang('${p.id}', false)">
-          ${imgHtml}
-          <div class="kasir-item-info">
-            <div class="kasir-item-name">${p.nama}</div>
-            <div class="kasir-item-price">${formatRupiah(p.harga)}</div>
-            <div class="kasir-item-stock">${stokText}</div>
-            ${p.isiBtg > 0 ? `
-              <button class="btn btn-warning btn-sm btn-full" style="margin-top:6px; font-size:10px; padding:3px;" onclick="event.stopPropagation(); tambahKeKeranjang('${p.id}', true)">
-                Ecer (${formatRupiah(p.hrgBtg)}/btg)
-              </button>
-            ` : ''}
-          </div>
-        </div>
-      `;
-    });
-    container.innerHTML = html;
+  // 1. Cek elemen container produk
+  const container = document.getElementById('kasir-produk-list');
+  if (!container) {
+    console.error("Elemen dengan ID 'kasir-produk-list' tidak ditemukan di HTML!");
+    return;
   }
+
+  // 2. Ambil data produk dari LocalStorage
+  const list = getStorage('produkList', []);
+  const searchInput = document.getElementById('kasir-search');
+  const keyword = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
+  // 3. Filter data berdasarkan kategori & kata kunci
+  const filtered = list.filter(p => {
+    const pKat = (p.kategori || 'Umum').toLowerCase().trim();
+    const currentKat = (window.currentKategoriKasir || 'Semua').toLowerCase().trim();
+    
+    // Pencocokan fleksibel (Roko / Rokok)
+    const matchKat = currentKat === 'semua' || pKat.includes(currentKat) || currentKat.includes(pKat);
+    const matchKw = !keyword || p.nama.toLowerCase().includes(keyword) || (p.barcode && p.barcode.toLowerCase().includes(keyword));
+    
+    return matchKat && matchKw;
+  });
+
+  // 4. Jika data kosong
+  if (filtered.length === 0) {
+    container.innerHTML = `<div style="grid-column: 1 / -1; text-align:center; padding:30px; color:#94a3b8;">Tidak ada produk yang ditampilkan</div>`;
+    return;
+  }
+
+  // 5. Render list produk
+  let html = '';
+  filtered.forEach(p => {
+    const imgHtml = p.foto ? `<img src="${p.foto}" class="kasir-item-img">` : `<div class="kasir-item-img" style="font-size:24px; text-align:center;">📦</div>`;
+    const stokText = (p.stok === null || p.stok === undefined || p.stok === '') ? 'Stok: ∞' : `Stok: ${p.stok}`;
+
+    html += `
+      <div class="kasir-item-card" onclick="tambahKeKeranjang('${p.id}')" style="border:1px solid #e2e8f0; padding:10px; border-radius:8px; margin-bottom:10px; cursor:pointer;">
+        ${imgHtml}
+        <div class="kasir-item-info">
+          <div style="font-weight:bold;">${p.nama}</div>
+          <div style="color:#059669; font-weight:600;">Rp ${Number(p.harga || 0).toLocaleString('id-ID')}</div>
+          <div style="font-size:12px; color:#64748b;">${stokText}</div>
+        </div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+}
 
   function tambahKeKeranjang(idProduk, isEcer) {
     const list = getStorage('produkList', []);
