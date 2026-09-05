@@ -2,11 +2,10 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Kasir Warung Super</title>
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-  <!-- Library SheetJS untuk membaca file Excel (.xlsx) -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
@@ -49,7 +48,7 @@
     .kasir-item-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; }
     .kasir-item-img { width: 100%; height: 90px; object-fit: cover; background: #f8fafc; display: flex; align-items: center; justify-content: center; color: #cbd5e1; font-size: 32px; }
     .kasir-item-info { padding: 8px; }
-    .kasir-item-name { font-weight: 600; font-size: 13px; color: #1e293b; line-height: 1.2; margin-bottom: 4px; display: flex; align-items: center; gap: 4px; }
+    .kasir-item-name { font-weight: 600; font-size: 13px; color: #1e293b; line-height: 1.2; margin-bottom: 4px; }
     .kasir-item-price { font-weight: 700; color: #0d9488; font-size: 13px; }
     .kasir-item-stock { font-size: 10px; color: #94a3b8; }
 
@@ -73,23 +72,10 @@
 
     .badge { padding: 3px 8px; border-radius: 12px; font-size: 10px; font-weight: 700; }
     .badge-success { background: #dcfce7; color: #166534; }
-    .badge-warning { background: #fef3c7; color: #92400e; }
-    .badge-danger { background: #fee2e2; color: #991b1b; }
 
     .camera-preview { width: 100%; max-height: 250px; background: #000; border-radius: 8px; object-fit: cover; margin-bottom: 10px; }
 
-    .kat-item-badge {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      padding: 8px 12px;
-      border-radius: 8px;
-      margin-bottom: 6px;
-      font-size: 13px;
-      font-weight: 600;
-    }
+    .kat-item-badge { display: flex; align-items: center; justify-content: space-between; background: #f8fafc; border: 1px solid #e2e8f0; padding: 8px 12px; border-radius: 8px; margin-bottom: 6px; font-size: 13px; font-weight: 600; }
   </style>
 </head>
 <body>
@@ -210,7 +196,7 @@
         </div>
       </div>
 
-      <!-- FITUR IMPORT EXCEL (PERBAIKAN FITUR TERUJI) -->
+      <!-- IMPORT EXCEL -->
       <div class="card" style="background:#f0f9ff; border:1px dashed #0284c7;">
         <div style="font-weight:700; font-size:13px; color:#0369a1; margin-bottom:6px;">📊 Import Produk dari Excel (.xlsx)</div>
         <p style="font-size:11px; color:#0284c7; margin-bottom:10px; line-height:1.4;">
@@ -218,7 +204,7 @@
           <b>nama</b>, <b>harga</b>, <b>hpp</b>, <b>stok</b>, <b>kategori</b>, <b>barcode</b>
         </p>
         <div style="display:flex; flex-direction:column; gap:8px;">
-          <input type="file" id="excel-file-input" accept=".xlsx, .xls, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" class="form-control" style="background:#fff;">
+          <input type="file" id="excel-file-input" accept=".xlsx, .xls" class="form-control" style="background:#fff;">
           <button class="btn btn-primary btn-full btn-sm" onclick="prosesImportExcel()" style="background:#0284c7;">🚀 Proses Import Excel</button>
         </div>
       </div>
@@ -358,7 +344,7 @@
 
 </div>
 
-<!-- MODAL KELOLA KATEGORI (PERBAIKAN FITUR TERUJI) -->
+<!-- MODAL KELOLA KATEGORI -->
 <div id="modal-kelola-kategori" class="modal">
   <div class="modal-content">
     <div class="title">
@@ -390,7 +376,7 @@
   </div>
 </div>
 
-<!-- MODAL VISUAL SCAN (OCR KEMASAN) -->
+<!-- MODAL VISUAL SCAN -->
 <div id="modal-visual-scan" class="modal">
   <div class="modal-content">
     <div class="title">
@@ -429,7 +415,7 @@
   </div>
 </div>
 
-<!-- MODAL KERANJANG & BAYAR -->
+<!-- MODAL KERANJANG -->
 <div id="modal-keranjang" class="modal">
   <div class="modal-content">
     <div class="title">
@@ -471,7 +457,7 @@
   </div>
 </div>
 
-<!-- MODAL STRUK / NOTA -->
+<!-- MODAL STRUK -->
 <div id="modal-struk" class="modal">
   <div class="modal-content">
     <div class="title">
@@ -504,6 +490,23 @@
     return 'Rp ' + (parseFloat(number) || 0).toLocaleString('id-ID');
   }
 
+  function getStorage(key, defaultVal) {
+    try {
+      const data = localStorage.getItem(key);
+      return data ? JSON.parse(data) : defaultVal;
+    } catch (e) {
+      return defaultVal;
+    }
+  }
+
+  function setStorage(key, val) {
+    try {
+      localStorage.setItem(key, JSON.stringify(val));
+    } catch (e) {
+      console.error('Storage error', e);
+    }
+  }
+
   function switchTab(tabName) {
     const pages = document.querySelectorAll('.page');
     pages.forEach(p => p.classList.remove('active'));
@@ -520,32 +523,33 @@
     });
 
     if (tabName === 'Beranda') renderDashboard();
-    if (tabName === 'Kasir') renderKasirProduk();
+    if (tabName === 'Kasir') {
+      renderKasirKategoriFilter();
+      renderKasirProduk();
+    }
     if (tabName === 'Produk') renderMasterProduk();
     if (tabName === 'Kasbon') renderKasbonList();
     if (tabName === 'Setting') loadSettingForm();
   }
 
-  // LOGIKA KELOLA KATEGORI
+  // KATEGORI
   function bukaModalKelolaKategori() {
     renderModalKategoriList();
-    const modal = document.getElementById('modal-kelola-kategori');
-    if (modal) modal.classList.add('active');
+    document.getElementById('modal-kelola-kategori').classList.add('active');
   }
 
   function tutupModalKelolaKategori() {
-    const modal = document.getElementById('modal-kelola-kategori');
-    if (modal) modal.classList.remove('active');
+    document.getElementById('modal-kelola-kategori').classList.remove('active');
     renderKategoriChips();
     populateKategoriDropdown();
     renderKasirKategoriFilter();
   }
 
   function getKategoriData() {
-    let list = JSON.parse(localStorage.getItem('kategoriList') || '[]');
+    let list = getStorage('kategoriList', []);
     if (list.length === 0) {
       list = ['Umum', 'Makanan', 'Minuman', 'Rokok', 'Sembako'];
-      localStorage.setItem('kategoriList', JSON.stringify(list));
+      setStorage('kategoriList', list);
     }
     return list;
   }
@@ -588,7 +592,7 @@
     }
 
     list.push(val);
-    localStorage.setItem('kategoriList', JSON.stringify(list));
+    setStorage('kategoriList', list);
     input.value = '';
     showToast('Kategori berhasil ditambahkan!');
     renderModalKategoriList();
@@ -597,7 +601,7 @@
   function hapusKategoriModal(index) {
     let list = getKategoriData();
     list.splice(index, 1);
-    localStorage.setItem('kategoriList', JSON.stringify(list));
+    setStorage('kategoriList', list);
     showToast('Kategori dihapus');
     renderModalKategoriList();
   }
@@ -621,7 +625,7 @@
     select.innerHTML = list.map(k => `<option value="${k}">${k}</option>`).join('');
   }
 
-  // LOGIKA IMPORT EXCEL (.XLSX)
+  // IMPORT EXCEL
   function prosesImportExcel() {
     const fileInput = document.getElementById('excel-file-input');
     if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
@@ -630,7 +634,7 @@
     }
 
     if (typeof XLSX === 'undefined') {
-      showToast("Library XLSX sedang di-load. Pastikan terhubung internet!");
+      showToast("Library XLSX gagal dimuat. Pastikan koneksi internet aktif!");
       return;
     }
 
@@ -647,11 +651,11 @@
         const jsonResult = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
 
         if (!jsonResult || jsonResult.length === 0) {
-          showToast("File Excel kosong atau format kolom tidak sesuai!");
+          showToast("File Excel kosong!");
           return;
         }
 
-        let produkList = JSON.parse(localStorage.getItem('produkList') || '[]');
+        let produkList = getStorage('produkList', []);
         let kategoriList = getKategoriData();
         let countImport = 0;
 
@@ -692,8 +696,8 @@
           countImport++;
         });
 
-        localStorage.setItem('produkList', JSON.stringify(produkList));
-        localStorage.setItem('kategoriList', JSON.stringify(kategoriList));
+        setStorage('produkList', produkList);
+        setStorage('kategoriList', kategoriList);
 
         showToast(`Berhasil mengimpor ${countImport} produk!`);
         
@@ -701,17 +705,18 @@
         renderKategoriChips();
         populateKategoriDropdown();
         renderMasterProduk();
+        renderKasirProduk();
 
       } catch (err) {
         console.error(err);
-        showToast("Gagal membaca file Excel. Pastikan format .xlsx!");
+        showToast("Gagal membaca Excel. Pastikan format .xlsx!");
       }
     };
 
     reader.readAsArrayBuffer(file);
   }
 
-  // LOGIKA PRODUK
+  // PRODUK
   let tempFotoData = '';
   function previewFotoProduk(e) {
     const file = e.target.files[0];
@@ -736,13 +741,13 @@
       return;
     }
 
-    let list = JSON.parse(localStorage.getItem('produkList') || '[]');
+    let list = getStorage('produkList', []);
 
     const itemData = {
       id: idEdit || ('p_' + Date.now()),
       barcode: document.getElementById('p-barcode').value.trim(),
       nama: nama,
-      kategori: document.getElementById('p-kategori').value,
+      kategori: document.getElementById('p-kategori').value || 'Umum',
       stok: document.getElementById('p-stok').value === '' ? null : parseFloat(document.getElementById('p-stok').value),
       harga: harga,
       hpp: parseFloat(document.getElementById('p-hpp').value) || 0,
@@ -764,13 +769,14 @@
       showToast('Produk ditambahkan!');
     }
 
-    localStorage.setItem('produkList', JSON.stringify(list));
+    setStorage('produkList', list);
     resetFormProduk();
     renderMasterProduk();
+    renderKasirProduk();
   }
 
   function editProduk(id) {
-    const list = JSON.parse(localStorage.getItem('produkList') || '[]');
+    const list = getStorage('produkList', []);
     const p = list.find(item => item.id === id);
     if (!p) return;
 
@@ -798,11 +804,12 @@
 
   function hapusProduk(id) {
     if (!confirm('Yakin hapus produk ini?')) return;
-    let list = JSON.parse(localStorage.getItem('produkList') || '[]');
+    let list = getStorage('produkList', []);
     list = list.filter(p => p.id !== id);
-    localStorage.setItem('produkList', JSON.stringify(list));
+    setStorage('produkList', list);
     showToast('Produk dihapus');
     renderMasterProduk();
+    renderKasirProduk();
   }
 
   function resetFormProduk() {
@@ -824,7 +831,7 @@
   function renderMasterProduk() {
     const container = document.getElementById('master-produk-list');
     if (!container) return;
-    const list = JSON.parse(localStorage.getItem('produkList') || '[]');
+    const list = getStorage('produkList', []);
 
     if (list.length === 0) {
       container.innerHTML = `<div style="text-align:center; padding:20px; color:#94a3b8;">Belum ada produk. Tambahkan produk baru atau Import Excel di atas.</div>`;
@@ -841,7 +848,7 @@
           <div>
             <div style="font-weight:700; color:#1e293b;">${p.nama}</div>
             <div style="font-size:11px; color:#64748b;">
-              ${p.kategori} • ${formatRupiah(p.harga)} | Stok: <b>${stokText}</b>
+              ${p.kategori || 'Umum'} • ${formatRupiah(p.harga)} | Stok: <b>${stokText}</b>
             </div>
           </div>
           <div style="display:flex; gap:4px;">
@@ -854,7 +861,7 @@
     container.innerHTML = html;
   }
 
-  // LOGIKA KASIR & KERANJANG
+  // KASIR & KERANJANG
   let cart = [];
   let currentKategoriKasir = 'Semua';
 
@@ -881,17 +888,18 @@
     const container = document.getElementById('kasir-produk-list');
     if (!container) return;
 
-    const list = JSON.parse(localStorage.getItem('produkList') || '[]');
+    const list = getStorage('produkList', []);
     const keyword = (document.getElementById('kasir-search').value || '').toLowerCase();
 
     const filtered = list.filter(p => {
-      const matchKat = currentKategoriKasir === 'Semua' || p.kategori === currentKategoriKasir;
+      const pKat = p.kategori || 'Umum';
+      const matchKat = currentKategoriKasir === 'Semua' || pKat === currentKategoriKasir;
       const matchKw = p.nama.toLowerCase().includes(keyword) || (p.barcode && p.barcode.toLowerCase().includes(keyword));
       return matchKat && matchKw;
     });
 
     if (filtered.length === 0) {
-      container.innerHTML = `<div style="grid-column: span 2; text-align:center; padding:20px; color:#94a3b8;">Produk tidak ditemukan</div>`;
+      container.innerHTML = `<div style="grid-column: span 2; text-align:center; padding:20px; color:#94a3b8;">Tidak ada produk ditampilkan</div>`;
       return;
     }
 
@@ -920,7 +928,7 @@
   }
 
   function tambahKeKeranjang(idProduk, isEcer) {
-    const list = JSON.parse(localStorage.getItem('produkList') || '[]');
+    const list = getStorage('produkList', []);
     const p = list.find(item => item.id === idProduk);
     if (!p) return;
 
@@ -964,13 +972,11 @@
 
   function bukaModalKeranjang() {
     renderCartList();
-    const modal = document.getElementById('modal-keranjang');
-    if (modal) modal.classList.add('active');
+    document.getElementById('modal-keranjang').classList.add('active');
   }
 
   function tutupModalKeranjang() {
-    const modal = document.getElementById('modal-keranjang');
-    if (modal) modal.classList.remove('active');
+    document.getElementById('modal-keranjang').classList.remove('active');
   }
 
   function renderCartList() {
@@ -1062,8 +1068,7 @@
       }
     }
 
-    // POTONG STOK
-    let produkList = JSON.parse(localStorage.getItem('produkList') || '[]');
+    let produkList = getStorage('produkList', []);
     cart.forEach(item => {
       const p = produkList.find(x => x.id === item.id);
       if (p) {
@@ -1074,9 +1079,8 @@
         }
       }
     });
-    localStorage.setItem('produkList', JSON.stringify(produkList));
+    setStorage('produkList', produkList);
 
-    // SIMPAN TRANSAKSI
     const transaksi = {
       id: 'TRX-' + Date.now(),
       waktu: new Date().toISOString(),
@@ -1089,12 +1093,12 @@
       pelanggan: namaPelanggan
     };
 
-    let trxList = JSON.parse(localStorage.getItem('transaksiList') || '[]');
+    let trxList = getStorage('transaksiList', []);
     trxList.push(transaksi);
-    localStorage.setItem('transaksiList', JSON.stringify(trxList));
+    setStorage('transaksiList', trxList);
 
     if (status === 'Kasbon') {
-      let kasbonList = JSON.parse(localStorage.getItem('kasbonList') || '[]');
+      let kasbonList = getStorage('kasbonList', []);
       kasbonList.push({
         id: 'KB-' + Date.now(),
         nama: namaPelanggan,
@@ -1102,7 +1106,7 @@
         catatan: cart.map(i => `${i.nama} (${i.qty})`).join(', '),
         tanggal: new Date().toLocaleDateString('id-ID')
       });
-      localStorage.setItem('kasbonList', JSON.stringify(kasbonList));
+      setStorage('kasbonList', kasbonList);
     }
 
     showToast('Transaksi Berhasil!');
@@ -1115,11 +1119,11 @@
     renderKasirProduk();
   }
 
-  // STRUK / NOTA
+  // STRUK
   let lastTransaksi = null;
   function tampilStruk(trx) {
     lastTransaksi = trx;
-    const cfg = JSON.parse(localStorage.getItem('tokoConfig') || '{}');
+    const cfg = getStorage('tokoConfig', {});
     const namaToko = cfg.nama || 'WARUNG BISMILLAH';
     const alamat = cfg.alamat || 'Cisarua, Bogor';
 
@@ -1160,7 +1164,7 @@
 
   function kirimStrukWA() {
     if (!lastTransaksi) return;
-    const cfg = JSON.parse(localStorage.getItem('tokoConfig') || '{}');
+    const cfg = getStorage('tokoConfig', {});
     let text = `*${cfg.nama || 'WARUNG BISMILLAH'}*\nNota Transaksi:\n\n`;
     lastTransaksi.items.forEach(i => {
       text += `- ${i.nama} (${i.qty}x) = ${formatRupiah(i.harga * i.qty)}\n`;
@@ -1169,13 +1173,9 @@
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
   }
 
-  // SEBLAK / CUSTOM
-  function bukaModalSeblak() {
-    document.getElementById('modal-seblak').classList.add('active');
-  }
-  function tutupModalSeblak() {
-    document.getElementById('modal-seblak').classList.remove('active');
-  }
+  // SEBLAK
+  function bukaModalSeblak() { document.getElementById('modal-seblak').classList.add('active'); }
+  function tutupModalSeblak() { document.getElementById('modal-seblak').classList.remove('active'); }
   function tambahSeblakKeKeranjang() {
     const hrg = parseFloat(document.getElementById('seblak-harga').value) || 0;
     const cat = document.getElementById('seblak-catatan').value.trim() || 'Seblak Custom';
@@ -1202,29 +1202,38 @@
     document.getElementById('seblak-catatan').value = '';
   }
 
-  // SCANNER BARCODE & OCR
+  // SCANNER BARCODE
   let html5QrCode = null;
   let targetScanner = '';
 
   function bukaModalScanner(target) {
     targetScanner = target;
     document.getElementById('modal-scanner').classList.add('active');
-    html5QrCode = new Html5Qrcode("qr-reader");
-    html5QrCode.start(
-      { facingMode: "environment" },
-      { fps: 10, qrbox: 250 },
-      (decodedText) => {
-        if (targetScanner === 'produk') {
-          document.getElementById('p-barcode').value = decodedText;
-        } else if (targetScanner === 'kasir') {
-          document.getElementById('kasir-search').value = decodedText;
-          renderKasirProduk();
-        }
+    
+    try {
+      html5QrCode = new Html5Qrcode("qr-reader");
+      html5QrCode.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: 250 },
+        (decodedText) => {
+          if (targetScanner === 'produk') {
+            document.getElementById('p-barcode').value = decodedText;
+          } else if (targetScanner === 'kasir') {
+            document.getElementById('kasir-search').value = decodedText;
+            renderKasirProduk();
+          }
+          tutupModalScanner();
+          showToast('Barcode Terbaca!');
+        },
+        () => {}
+      ).catch(err => {
+        showToast('Izin kamera ditolak / Kamera tidak aktif di APK');
         tutupModalScanner();
-        showToast('Barcode Terbaca!');
-      },
-      () => {}
-    );
+      });
+    } catch(e) {
+      showToast('Kamera tidak didukung pada sistem APK ini');
+      tutupModalScanner();
+    }
   }
 
   function tutupModalScanner() {
@@ -1240,7 +1249,7 @@
     }
   }
 
-  // OCR KEMASAN
+  // VISUAL SCAN (OCR)
   let visualStream = null;
   let targetVisualScan = '';
 
@@ -1248,12 +1257,17 @@
     targetVisualScan = target;
     document.getElementById('modal-visual-scan').classList.add('active');
     const video = document.getElementById('visual-video');
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-      .then(stream => {
-        visualStream = stream;
-        video.srcObject = stream;
-      })
-      .catch(() => showToast('Gagal mengakses kamera'));
+    
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+        .then(stream => {
+          visualStream = stream;
+          video.srcObject = stream;
+        })
+        .catch(() => showToast('Gagal mengakses kamera'));
+    } else {
+      showToast('Akses kamera tidak diizinkan di APK');
+    }
   }
 
   function tutupModalVisualScan() {
@@ -1273,6 +1287,12 @@
     canvas.getContext('2d').drawImage(video, 0, 0);
 
     loading.style.display = 'block';
+
+    if (typeof Tesseract === 'undefined') {
+      loading.style.display = 'none';
+      showToast('Library OCR butuh koneksi internet!');
+      return;
+    }
 
     Tesseract.recognize(canvas, 'ind', { logger: m => console.log(m) })
       .then(({ data: { text } }) => {
@@ -1302,7 +1322,7 @@
   function renderKasbonList() {
     const container = document.getElementById('kasbon-list');
     if (!container) return;
-    const list = JSON.parse(localStorage.getItem('kasbonList') || '[]');
+    const list = getStorage('kasbonList', []);
 
     if (list.length === 0) {
       container.innerHTML = `<div style="text-align:center; padding:20px; color:#94a3b8;">Belum ada kasbon aktif</div>`;
@@ -1334,7 +1354,7 @@
       return;
     }
 
-    let list = JSON.parse(localStorage.getItem('kasbonList') || '[]');
+    let list = getStorage('kasbonList', []);
     list.push({
       id: 'KB-' + Date.now(),
       nama: nama,
@@ -1343,7 +1363,7 @@
       tanggal: new Date().toLocaleDateString('id-ID')
     });
 
-    localStorage.setItem('kasbonList', JSON.stringify(list));
+    setStorage('kasbonList', list);
     showToast('Kasbon berhasil dicatat');
     document.getElementById('kb-nama').value = '';
     document.getElementById('kb-jumlah').value = '';
@@ -1353,17 +1373,17 @@
 
   function pelunasanKasbon(idx) {
     if (!confirm('Tandai kasbon ini sudah LUNAS?')) return;
-    let list = JSON.parse(localStorage.getItem('kasbonList') || '[]');
+    let list = getStorage('kasbonList', []);
     list.splice(idx, 1);
-    localStorage.setItem('kasbonList', JSON.stringify(list));
+    setStorage('kasbonList', list);
     showToast('Kasbon Lunas!');
     renderKasbonList();
   }
 
-  // DASHBOARD BERANDA
+  // DASHBOARD
   function renderDashboard() {
     document.getElementById('dash-date').innerText = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' });
-    const trxList = JSON.parse(localStorage.getItem('transaksiList') || '[]');
+    const trxList = getStorage('transaksiList', []);
     
     const todayStr = new Date().toISOString().split('T')[0];
     const todayTrx = trxList.filter(t => t.waktu && t.waktu.startsWith(todayStr));
@@ -1378,9 +1398,8 @@
     document.getElementById('lap-omzet').innerText = formatRupiah(totalOmzet);
     document.getElementById('lap-hpp').innerText = formatRupiah(totalHpp);
 
-    // CEK STOK RENDAH
-    const produkList = JSON.parse(localStorage.getItem('produkList') || '[]');
-    const cfg = JSON.parse(localStorage.getItem('tokoConfig') || '{}');
+    const produkList = getStorage('produkList', []);
+    const cfg = getStorage('tokoConfig', {});
     const minStok = parseFloat(cfg.minstok) || 3;
 
     const stokRendah = produkList.filter(p => p.stok !== null && p.stok <= minStok);
@@ -1400,7 +1419,7 @@
 
   // SETTING & BACKUP
   function loadSettingForm() {
-    const cfg = JSON.parse(localStorage.getItem('tokoConfig') || '{}');
+    const cfg = getStorage('tokoConfig', {});
     document.getElementById('cfg-nama').value = cfg.nama || 'WARUNG BISMILLAH';
     document.getElementById('cfg-alamat').value = cfg.alamat || 'Cisarua, Bogor';
     document.getElementById('cfg-wa').value = cfg.wa || '';
@@ -1417,17 +1436,17 @@
       footer: document.getElementById('cfg-footer').value.trim(),
       minstok: document.getElementById('cfg-minstok').value || 3
     };
-    localStorage.setItem('tokoConfig', JSON.stringify(cfg));
+    setStorage('tokoConfig', cfg);
     showToast('Pengaturan Disimpan!');
   }
 
   function exportJSON() {
     const data = {
-      produkList: JSON.parse(localStorage.getItem('produkList') || '[]'),
+      produkList: getStorage('produkList', []),
       kategoriList: getKategoriData(),
-      transaksiList: JSON.parse(localStorage.getItem('transaksiList') || '[]'),
-      kasbonList: JSON.parse(localStorage.getItem('kasbonList') || '[]'),
-      tokoConfig: JSON.parse(localStorage.getItem('tokoConfig') || '{}')
+      transaksiList: getStorage('transaksiList', []),
+      kasbonList: getStorage('kasbonList', []),
+      tokoConfig: getStorage('tokoConfig', {})
     };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const a = document.createElement('a');
@@ -1443,11 +1462,11 @@
     reader.onload = function(evt) {
       try {
         const data = JSON.parse(evt.target.result);
-        if (data.produkList) localStorage.setItem('produkList', JSON.stringify(data.produkList));
-        if (data.kategoriList) localStorage.setItem('kategoriList', JSON.stringify(data.kategoriList));
-        if (data.transaksiList) localStorage.setItem('transaksiList', JSON.stringify(data.transaksiList));
-        if (data.kasbonList) localStorage.setItem('kasbonList', JSON.stringify(data.kasbonList));
-        if (data.tokoConfig) localStorage.setItem('tokoConfig', JSON.stringify(data.tokoConfig));
+        if (data.produkList) setStorage('produkList', data.produkList);
+        if (data.kategoriList) setStorage('kategoriList', data.kategoriList);
+        if (data.transaksiList) setStorage('transaksiList', data.transaksiList);
+        if (data.kasbonList) setStorage('kasbonList', data.kasbonList);
+        if (data.tokoConfig) setStorage('tokoConfig', data.tokoConfig);
         showToast('Data Berhasil Dipulihkan!');
         location.reload();
       } catch (err) {
@@ -1458,7 +1477,7 @@
   }
 
   function exportLaporanCSV() {
-    const trxList = JSON.parse(localStorage.getItem('transaksiList') || '[]');
+    const trxList = getStorage('transaksiList', []);
     if (trxList.length === 0) {
       showToast('Belum ada transaksi untuk diunduh!');
       return;
@@ -1484,11 +1503,13 @@
     }
   }
 
-  // INISIALISASI SAAT APLIKASI MEMUAT
+  // INIT
   window.addEventListener('DOMContentLoaded', () => {
     renderKategoriChips();
     populateKategoriDropdown();
     renderKasirKategoriFilter();
+    renderKasirProduk();
+    renderMasterProduk();
     renderDashboard();
   });
 </script>
